@@ -1,109 +1,117 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net;
+using System.Reflection;
+using System.Runtime.Remoting.Metadata.W3cXsd2001;
+using System.Security.Cryptography;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
+using Cryptography;
 
 namespace Imgix_CSharp
 {
-    public class URLBuilder
+    public class UrlBuilder
     {
-        public const String VERSION = "0.0.1";
-
-        public enum ShardStrategy
+        public enum ShardStrategyType
         {
             NONE,
             CRC,
             CYCLE
         }
 
-        public String[] domains { get; set; }
-        public Boolean useHttps { get; set; }
-        public String signKey { get; set; }
-        public ShardStrategy shardStrategy { get; set; }
-        public Boolean signWithLibraryParameter { get; set; }
+        public String[] Domains { get; private set; }
+        public Boolean UseHttps { get; private set; }
 
-        private int shardCycleNextIndex = 0;
+        public Dictionary<String, String> Parameters = new Dictionary<string, string>();
 
-        public URLBuilder(String[] domains, Boolean useHttps, String signKey, ShardStrategy shardStrategy,
-            Boolean signWithLibraryParameter)
+        public String SignKey { get; set; }
+        public ShardStrategyType ShardStrategy;
+        public Boolean SignWithLibrary { get; set; }
+
+        private int ShardCycleIndex = 0;
+
+        public UrlBuilder(String[] domains, Boolean useHttps = false)
         {
-            if (domains == null || domains.Length == 0)
+            if (useHttps && ShardStrategy == ShardStrategyType.NONE)
             {
-                throw new ArgumentException("At least one domain must be passed into URLBuilder.");
+                ShardStrategy = ShardStrategyType.CRC;
             }
 
-            this.domains = domains;
-            this.useHttps = useHttps;
-            this.signKey = signKey;
-            this.shardStrategy = shardStrategy;
-            this.signWithLibraryParameter = signWithLibraryParameter;
+            UseHttps = useHttps;
+            Domains = domains;
         }
 
-
-        public URLBuilder(String domain) : this(new[] { domain }, false, String.Empty, ShardStrategy.NONE, false)
+        public UrlBuilder(String domain, Boolean useHttps = false)
         {
-        }
-
-        public URLBuilder(String[] domain) : this(domain, false, String.Empty, ShardStrategy.NONE, false)
-        {
-        }
-
-        public URLBuilder(String domain, Boolean useHttps) : this(new[] { domain }, useHttps, String.Empty, ShardStrategy.NONE, false)
-        {
-        }
-
-        public URLBuilder(String[] domain, Boolean useHttps) : this(domain, useHttps, String.Empty, ShardStrategy.NONE, false)
-        {
-        }
-
-        public URLBuilder(String domain, Boolean useHttps, String signKey) : this(new[] { domain }, useHttps, signKey, ShardStrategy.CRC, true)
-        {
-        }
-
-        public URLBuilder(String[] domain, Boolean useHttps, String signKey) : this(domain, useHttps, signKey, ShardStrategy.CRC, true)
-        {
-        }
-
-        public URLBuilder(String domain, Boolean useHttps, String signKey, ShardStrategy shardStrategy) : this(new[] { domain }, useHttps, signKey, shardStrategy, true)
-        {
-        }
-
-        public String CreateUrl(String path)
-        {
-            return CreateUrl(path, new Dictionary<String, String>());
-        }
-
-        public String CreateUrl(String path, Dictionary<String, String> parameters)
-        {
-            String scheme = this.useHttps ? "https" : "http";
-
-            String domain;
-
-            if (shardStrategy == ShardStrategy.CRC)
+            if (useHttps && ShardStrategy == ShardStrategyType.NONE)
             {
-                var crc = new Crc32();
-                var hash = crc.ComputeHash(path.Select(Convert.ToByte).ToArray()).ToString().ToLower();
-
-                var index = (int) (hash%domains.Length);
+                ShardStrategy = ShardStrategyType.CRC;
             }
 
-            else if (shardStrategy == ShardStrategy.CYCLE)
-            {
+            UseHttps = useHttps;
+            Domains = new[] { domain };
+        }
 
+        public String BuildUrl(String path)
+        {   
+            int index = 0;
+
+            if (ShardStrategy == ShardStrategyType.CRC)
+            {
+                var c = new Crc32();
+                var hash = c.ComputeCrcHash(path);
+
+                index = ((int)hash)%Domains.Length;
             }
 
-            else
+            else if (ShardStrategy == ShardStrategyType.CYCLE)
             {
-                domain = domains[0];
+                index = (ShardCycleIndex++)%Domains.Length;
             }
 
-            if (signWithLibraryParameter)
+            var domain = Domains.ElementAt(index);
+
+            if (SignWithLibrary)
             {
-                //parameters.Add("ixlib", "csharp-" + VERSION);
+                Parameters.Add("ixlib", String.Format("csharp-{0}", Assembly.GetExecutingAssembly().GetName().Version));
             }
 
-            return String.Empty;
+            return GenerateUrl(path, domain);
+        }
+
+
+        private String GenerateUrl(String path, String domain)
+        {
+            var results = String.Empty;
+            String scheme = UseHttps ? "https" : "http";
+            path = path.TrimEnd('/').TrimStart('/');
+            
+            var qs = GenerateUrlStringFromDict(Parameters);
+            var localParams = new Dictionary<String, String>(Parameters);
+
+            if (!String.IsNullOrEmpty(SignKey))
+            {
+                var hashString = String.Format("{0}/{1}{2}", SignKey, path, localParams.Any() ? "?" + qs : String.Empty);
+                localParams.Add("s", HashString(hashString));
+            }
+
+            return String.Format("{0}://{1}/{2}{3}", scheme, domain, path, localParams.Any() ? "?" + GenerateUrlStringFromDict(localParams) : String.Empty);
+        }
+
+
+        private String HashString(String input)
+        {
+            return new SoapHexBinary(MD5.Create().ComputeHash(input.Select(Convert.ToByte).ToArray())).ToString().ToLower();
+        }
+
+        private String GenerateUrlStringFromDict(Dictionary<String, String> queryDictionary)
+        {
+            return queryDictionary == null ? 
+                String.Empty : 
+                String.Join("&", queryDictionary.Select(p => String.Format("{0}={1}", p.Key, WebUtility.UrlEncode(p.Value))));
         }
     }
 }
