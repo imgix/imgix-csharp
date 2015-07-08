@@ -1,4 +1,7 @@
 # Imgix-CSharp
+
+[![Build Status](https://travis-ci.org/raynjamin/Imgix-CSharp.svg?branch=master)](https://travis-ci.org/raynjamin/Imgix-CSharp)
+
 Imgix Url Builder Library Ported to C#. [ImgIX](http://http://www.imgix.com/) is an image manipulation framework over HTTP with a variety of benefits.
 
 ## Installation
@@ -36,5 +39,3 @@ This is a parameter that allows you further sign your requests with the current 
 Finally, to construct your url, call BuildUrl() on your builder object, with the image path as your sole parameter:
 
     builder.BuildUrl("/users/1.png") // http://domain.imgix.net/users/1.png
-
-[![Build Status](https://travis-ci.org/raynjamin/Imgix-CSharp.svg?branch=master)](https://travis-ci.org/raynjamin/Imgix-CSharp)
