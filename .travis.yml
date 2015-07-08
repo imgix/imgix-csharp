@@ -7,4 +7,4 @@ install:
 script:
   - xbuild /p:Configuration=Release Imgix-CSharp.sln
   - mono ./testrunner/NUnit.Runners.2.6.4/tools/nunit-console.exe ./CryptographyTests/bin/Release/CryptographyTests.dll
-  - mono ./testrunner/NUnit.Runners.2.6.4/tools/nunit-console.exe ./Imgix-CSharp-Tests/bin/Release/ImgixClientTests.dll
+  - mono ./testrunner/NUnit.Runners.2.6.4/tools/nunit-console.exe ./Imgix-CSharp-Tests/bin/Release/Imgix-CSharp-Tests.dll
