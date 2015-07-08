@@ -14,7 +14,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{A58700D4-72DD-453A-B260-3A144A2D14B8}"
 	ProjectSection(SolutionItems) = preProject
 		.travis.yml = .travis.yml
-		.nuget\packages.config = .nuget\packages.config
 	EndProjectSection
 EndProject
 Global
