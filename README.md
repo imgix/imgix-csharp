@@ -47,3 +47,4 @@ Finally, to construct your url, call BuildUrl() on your builder object, with the
 ```csharp
 builder.BuildUrl("/users/1.png") // http://domain.imgix.net/users/1.png
 ```
+
