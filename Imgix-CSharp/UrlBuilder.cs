@@ -91,7 +91,6 @@ namespace Imgix_CSharp
 
         private String GenerateUrl(String path, String domain)
         {
-            var results = String.Empty;
             String scheme = UseHttps ? "https" : "http";
             path = path.TrimEnd('/').TrimStart('/');
             

@@ -9,8 +9,6 @@ namespace Imgix_CSharp_Tests
     [TestFixture]
     public class UrlBuilderTest
     {
-        private String domain = "domain.imgix.net";
-        private String imagePath = "gaiman.jpg";
         private String SignKey = "aaAAbbBB11223344";
 
         [Test]
