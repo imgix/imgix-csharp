@@ -2,18 +2,18 @@
 using System.Linq;
 using Cryptography;
 using Imgix_CSharp;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace Imgix_CSharp_Tests
 {
-    [TestClass]
+    [TestFixture]
     public class UrlBuilderTest
     {
         private String domain = "domain.imgix.net";
         private String imagePath = "gaiman.jpg";
         private String SignKey = "aaAAbbBB11223344";
 
-        [TestMethod]
+        [Test]
         public void UrlBuilderBuildsBasicUrlHttp()
         {
             var test = new UrlBuilder("domain.imgix.net");
@@ -21,7 +21,7 @@ namespace Imgix_CSharp_Tests
             Assert.AreEqual(test.BuildUrl("gaiman.jpg"), "http://domain.imgix.net/gaiman.jpg");
         }
 
-        [TestMethod]
+        [Test]
         public void UrlBuilderBuildsBasicUrlHttps()
         {
             var test = new UrlBuilder("domain.imgix.net", useHttps: true);
@@ -29,7 +29,7 @@ namespace Imgix_CSharp_Tests
             Assert.AreEqual(test.BuildUrl("gaiman.jpg"), "https://domain.imgix.net/gaiman.jpg");
         }
 
-        [TestMethod]
+        [Test]
         public void UrlBuilderBuildsQueryStringUrlHttp()
         {
             var test = new UrlBuilder("domain.imgix.net");
@@ -40,7 +40,7 @@ namespace Imgix_CSharp_Tests
             Assert.AreEqual(test.BuildUrl("gaiman.jpg"), "http://domain.imgix.net/gaiman.jpg?w=500&blur=100");
         }
 
-        [TestMethod]
+        [Test]
         public void UrlBuilderBuildsQueryStringUrlHttps()
         {
             var test = new UrlBuilder("domain.imgix.net", useHttps: true);
@@ -51,7 +51,7 @@ namespace Imgix_CSharp_Tests
             Assert.AreEqual(test.BuildUrl("gaiman.jpg"), "https://domain.imgix.net/gaiman.jpg?w=500&blur=100");
         }
 
-        [TestMethod]
+        [Test]
         public void UrlBuilderUsesCRCShardingBydefault()
         {
             var test = new UrlBuilder("domain.imgix.net", useHttps: true);
@@ -59,7 +59,7 @@ namespace Imgix_CSharp_Tests
             Assert.AreEqual(test.ShardStrategy, UrlBuilder.ShardStrategyType.CRC);
         }
 
-        [TestMethod]
+        [Test]
         public void UrlBuilderSignsParameterlessRequests()
         {
             var test = new UrlBuilder("domain.imgix.net")
@@ -70,7 +70,7 @@ namespace Imgix_CSharp_Tests
             Assert.AreEqual(test.BuildUrl("gaiman.jpg"), "http://domain.imgix.net/gaiman.jpg?s=db6110637ad768e4b1d503cb96e6439a");
         }
 
-        [TestMethod]
+        [Test]
         public void UrlBuilderSignsParameteredRequests()
         {
             var test = new UrlBuilder("domain.imgix.net")
@@ -84,7 +84,7 @@ namespace Imgix_CSharp_Tests
             Assert.AreEqual(test.BuildUrl("gaiman.jpg"), "http://domain.imgix.net/gaiman.jpg?w=500&h=1000&s=fc4afbc39b6741560717142aeada876c");
         }
 
-        [TestMethod]
+        [Test]
         public void UrlBuilderSignsNestedPaths()
         {
             var test = new UrlBuilder("domain.imgix.net")
@@ -95,7 +95,7 @@ namespace Imgix_CSharp_Tests
             Assert.AreEqual(test.BuildUrl("test/gaiman.jpg"), "http://domain.imgix.net/test/gaiman.jpg?s=51033c27726f19c0f8229a1ed2dc8523");
         }
 
-        [TestMethod]
+        [Test]
         public void UrlBuilderWithMultipleDomainCyclesThroughDomains()
         {
             var domains = new[] {"domain.imgix.net", "domain2.imgix.net", "domain3.imgix.net"};
@@ -111,7 +111,7 @@ namespace Imgix_CSharp_Tests
             Assert.AreEqual(test.BuildUrl("gaiman.jpg"), "http://domain.imgix.net/gaiman.jpg");
         }
 
-        [TestMethod]
+        [Test]
         public void UrlBuilderWithMultipleDomainsPicksTheFirstWhenNoShardTypeSelected()
         {
             var domains = new[] { "domain.imgix.net", "domain2.imgix.net", "domain3.imgix.net" };
@@ -124,7 +124,7 @@ namespace Imgix_CSharp_Tests
             Assert.AreEqual(test.BuildUrl("gaiman.jpg"), "http://domain.imgix.net/gaiman.jpg");
         }
 
-        [TestMethod]
+        [Test]
         public void UrlBuilderWithMultipleDomainsSelectsServerByCRC()
         {
             var domains = new[] { "domain.imgix.net", "domain2.imgix.net", "domain3.imgix.net" };

@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Linq;
 using Cryptography;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 
 namespace CryptographyTests
 {
-    [TestClass]
+    [TestFixture]
     public class Crc32Test
     {
-        [TestMethod]
+        [Test]
         public void Crc32()
         {
             var crc = new Crc32();
