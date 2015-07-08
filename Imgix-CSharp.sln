@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImgixClient", "Imgix-CSharp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cryptography", "Cryptography\Cryptography.csproj", "{1320A482-BC45-4BCF-A726-E39FBDD0D0AB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CryptographyTests", "CryptographyTests\CryptographyTests.csproj", "{60657485-094E-4EDA-8FA5-746F12B85E24}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImgixClientTests", "Imgix-CSharp-Tests\ImgixClientTests.csproj", "{D0A6445F-5B74-473B-B69D-8D08D0D989F8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{1320A482-BC45-4BCF-A726-E39FBDD0D0AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1320A482-BC45-4BCF-A726-E39FBDD0D0AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1320A482-BC45-4BCF-A726-E39FBDD0D0AB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{60657485-094E-4EDA-8FA5-746F12B85E24}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{60657485-094E-4EDA-8FA5-746F12B85E24}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{60657485-094E-4EDA-8FA5-746F12B85E24}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{60657485-094E-4EDA-8FA5-746F12B85E24}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D0A6445F-5B74-473B-B69D-8D08D0D989F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0A6445F-5B74-473B-B69D-8D08D0D989F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0A6445F-5B74-473B-B69D-8D08D0D989F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0A6445F-5B74-473B-B69D-8D08D0D989F8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
