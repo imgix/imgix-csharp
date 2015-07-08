@@ -56,7 +56,13 @@ namespace Imgix_CSharp
         }
 
         public String BuildUrl(String path)
-        {   
+        {
+
+            if (path.StartsWith("http"))
+            {
+                path = WebUtility.UrlEncode(path);
+            }
+
             int index = 0;
 
             if (ShardStrategy == ShardStrategyType.CRC)
