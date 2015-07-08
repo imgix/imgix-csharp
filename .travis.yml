@@ -2,7 +2,7 @@ language: csharp
 solution: Imgix-CSharp.sln
 
 install:
-  - nuget restore solution-name.sln
+  - nuget restore Imgix-CSharp.sln
   - nuget install NUnit.Runners -Version 2.6.4 -OutputDirectory testrunner
 script:
   - xbuild /p:Configuration=Release Imgix-CSharp.sln
