@@ -14,16 +14,22 @@ Or you can clone this repository and build it.
 ## Usage
 The library can be invoked by newing up UrlBuilder with your imgix domain. You can optionally pass in a parameter for whether or not you want to use https.
 
-    var builder = new UrlBuilder("domain.imgix.net", useHttps: true);
+```csharp
+var builder = new UrlBuilder("domain.imgix.net", useHttps: true);
+```
     
 The constructor also accepts an array of domains, to support sharding:
 
-    var builder = new UrlBuilder(new [] { "domain.imgix.net", "domain2.imgix.net" }, useHttps: true);
+```csharp
+var builder = new UrlBuilder(new [] { "domain.imgix.net", "domain2.imgix.net" }, useHttps: true);
+```
 
 The UrlBuilder uses a dictionary (of key/value strings) called "Parameters" to specify the values you want to pass to imgIX along the queryString.
 
-    builder.Parameters.Add("w", "400");
-    builder.Parameters.Add("h", "300");
+```csharp
+builder.Parameters.Add("w", "400");
+builder.Parameters.Add("h", "300");
+```
     
 The UrlBuilder type also offers up a series of Properties:
 
@@ -38,4 +44,6 @@ This is a parameter that allows you further sign your requests with the current 
 
 Finally, to construct your url, call BuildUrl() on your builder object, with the image path as your sole parameter:
 
-    builder.BuildUrl("/users/1.png") // http://domain.imgix.net/users/1.png
+```csharp
+builder.BuildUrl("/users/1.png") // http://domain.imgix.net/users/1.png
+```
