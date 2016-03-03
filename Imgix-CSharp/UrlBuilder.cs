@@ -116,7 +116,24 @@ namespace Imgix_CSharp
         {
             return queryDictionary == null ? 
                 String.Empty : 
-                String.Join("&", queryDictionary.Select(p => String.Format("{0}={1}", p.Key, WebUtility.UrlEncode(p.Value))));
+				String.Join("&", queryDictionary.Select(p =>
+					{
+						String encodedKey = WebUtility.UrlEncode(p.Key);
+						String encodedVal;
+
+						if (p.Key.EndsWith("64") {
+							Byte[] valBytes = System.Text.Encoding.UTF8.GetBytes(p.Value);
+							encodedVal = System.Convert.ToBase64String(valBytes);
+							encodedVal = encodedVal.Replace("=", "");
+							encodedVal = encodedVal.Replace("/", "_");
+							encodedVal = encodedVal.Replace("+", "-");
+						} else {
+							encodedVal = WebUtility.UrlEncode(p.Value);
+						}
+
+						String.Format("{0}={1}", encodedKey, encodedVal)
+					}
+				));
         }
     }
 }
