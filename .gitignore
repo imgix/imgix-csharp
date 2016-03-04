@@ -9,6 +9,7 @@ testrunner
 *.suo
 *.user
 *.sln.docstates
+Imgix-CSharp.userprefs
 
 # Build results
 [Dd]ebug/
