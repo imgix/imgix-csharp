@@ -3,6 +3,8 @@
 *.nuspec
 TestResults
 
+testrunner
+
 # User-specific files
 *.suo
 *.user
