@@ -3,10 +3,13 @@
 *.nuspec
 TestResults
 
+testrunner
+
 # User-specific files
 *.suo
 *.user
 *.sln.docstates
+Imgix-CSharp.userprefs
 
 # Build results
 [Dd]ebug/

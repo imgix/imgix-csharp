@@ -137,5 +137,35 @@ namespace Imgix_CSharp_Tests
             Assert.AreEqual(test.BuildUrl("test2.png"), String.Format("http://{0}/test2.png", domains[crcs[1]]));
             Assert.AreEqual(test.BuildUrl("test3.png"), String.Format("http://{0}/test3.png", domains[crcs[2]]));
         }
+
+		[Test]
+		public void UrlBuilderEscapesParamKeys()
+		{
+			var test = new UrlBuilder("demo.imgix.net");
+
+			test.Parameters["hello world"] = "interesting";
+
+			Assert.AreEqual("http://demo.imgix.net/demo.png?hello%20world=interesting", test.BuildUrl("demo.png"));
+		}
+
+		[Test]
+		public void UrlBuilderEscapesParamValues()
+		{
+			var test = new UrlBuilder("demo.imgix.net");
+
+			test.Parameters["hello_world"] = "/foo\"> <script>alert(\"hacked\")</script><";
+
+			Assert.AreEqual("http://demo.imgix.net/demo.png?hello_world=%2Ffoo%22%3E%20%3Cscript%3Ealert(%22hacked%22)%3C%2Fscript%3E%3C", test.BuildUrl("demo.png"));
+		}
+
+		[Test]
+		public void UrlBuilderBase64EncodesBase64ParamVariants()
+		{
+			var test = new UrlBuilder("demo.imgix.net");
+
+			test.Parameters["txt64"] = "I cannøt belîév∑ it wors! \ud83d\ude31";
+
+			Assert.AreEqual("http://demo.imgix.net/~text?txt64=SSBjYW5uw7h0IGJlbMOuw6l24oiRIGl0IHdvcu-jv3MhIPCfmLE", test.BuildUrl("~text"));
+		}
     }
 }
