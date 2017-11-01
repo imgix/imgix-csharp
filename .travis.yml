@@ -2,9 +2,9 @@ language: csharp
 solution: Imgix-CSharp.sln
 
 install:
-  - nuget restore Imgix-CSharp.sln
+  - msbuild /t:Restore Imgix-CSharp.sln
   - nuget install NUnit.Runners -Version 2.6.4 -OutputDirectory testrunner
 script:
-  - xbuild /p:Configuration=Release Imgix-CSharp.sln
-  - mono ./testrunner/NUnit.Runners.2.6.4/tools/nunit-console.exe ./CryptographyTests/bin/Release/CryptographyTests.dll
-  - mono ./testrunner/NUnit.Runners.2.6.4/tools/nunit-console.exe ./Imgix-CSharp-Tests/bin/Release/Imgix-CSharp-Tests.dll
+  - msbuild /p:Configuration=Release Imgix-CSharp.sln
+  - mono ./testrunner/NUnit.Runners.2.6.4/tools/nunit-console.exe ./CryptographyTests/bin/Release/net46/CryptographyTests.dll
+  - mono ./testrunner/NUnit.Runners.2.6.4/tools/nunit-console.exe ./Imgix-CSharp-Tests/bin/Release/net46/ImgixClientTests.dll
