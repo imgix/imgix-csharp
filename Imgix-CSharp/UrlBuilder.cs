@@ -4,9 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
-using System.Runtime.Remoting.Metadata.W3cXsd2001;
 using System.Security.Cryptography;
-using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 using Cryptography;
@@ -82,7 +80,7 @@ namespace Imgix_CSharp
 
             if (SignWithLibrary)
             {
-                Parameters.Add("ixlib", String.Format("csharp-{0}", Assembly.GetExecutingAssembly().GetName().Version));
+                Parameters.Add("ixlib", String.Format("csharp-{0}", typeof(UrlBuilder).GetTypeInfo().Assembly.GetName().Version));
             }
 
             return GenerateUrl(path, domain);
@@ -109,7 +107,7 @@ namespace Imgix_CSharp
 
         private String HashString(String input)
         {
-            return new SoapHexBinary(MD5.Create().ComputeHash(input.Select(Convert.ToByte).ToArray())).ToString().ToLower();
+            return BitConverter.ToString(MD5.Create().ComputeHash(input.Select(Convert.ToByte).ToArray())).Replace("-", "").ToLower();
         }
 
         private String GenerateUrlStringFromDict(Dictionary<String, String> queryDictionary)
