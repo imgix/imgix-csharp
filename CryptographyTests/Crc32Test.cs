@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using Cryptography;
+﻿using Cryptography;
 using NUnit.Framework;
 
 namespace CryptographyTests
