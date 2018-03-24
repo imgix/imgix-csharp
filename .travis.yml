@@ -7,5 +7,5 @@ install:
   - dotnet restore
 script:
   - dotnet build -c release
-  - dotnet test ./CryptographyTests/bin/Release/netcoreapp2.0/CryptographyTests.dll
-  - dotnet test ./Imgix-CSharp-Tests/bin/Release/netcoreapp2.0/ImgixClientTests.dll
+  - dotnet test ./CryptographyTests/CryptographyTests.csproj
+  - dotnet test ./Imgix-CSharp-Tests/Imgix-CSharp-Tests.csproj
