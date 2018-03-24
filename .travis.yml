@@ -6,6 +6,6 @@ dotnet: 2.0.0
 install:
   - dotnet restore
 script:
-  - dotnet build
+  - dotnet build -c release
   - dotnet test ./CryptographyTests/bin/Release/netcoreapp2.0/CryptographyTests.dll
   - dotnet test ./Imgix-CSharp-Tests/bin/Release/netcoreapp2.0/ImgixClientTests.dll
