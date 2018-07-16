@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Cryptography;
 
-namespace Imgix_CSharp
+namespace Imgix
 {
     public class UrlBuilder
     {
