@@ -15,7 +15,6 @@ namespace Imgix
     {
         public enum ShardStrategyType
         {
-            NONE,
             CRC,
             CYCLE
         }
@@ -26,14 +25,14 @@ namespace Imgix
         public Dictionary<String, String> Parameters = new Dictionary<string, string>();
 
         public String SignKey { get; set; }
-        public ShardStrategyType ShardStrategy;
+        public ShardStrategyType? ShardStrategy = null;
         public Boolean SignWithLibrary { get; set; }
 
         private int ShardCycleIndex = 0;
 
         public UrlBuilder(String[] domains, Boolean useHttps = false)
         {
-            if (useHttps && ShardStrategy == ShardStrategyType.NONE)
+            if (ShardStrategy == null)
             {
                 ShardStrategy = ShardStrategyType.CRC;
             }
@@ -42,15 +41,8 @@ namespace Imgix
             Domains = domains;
         }
 
-        public UrlBuilder(String domain, Boolean useHttps = false)
+        public UrlBuilder(String domain, Boolean useHttps = false) : this(new[] { domain }, useHttps)
         {
-            if (useHttps && ShardStrategy == ShardStrategyType.NONE)
-            {
-                ShardStrategy = ShardStrategyType.CRC;
-            }
-
-            UseHttps = useHttps;
-            Domains = new[] { domain };
         }
 
         public String BuildUrl(String path)
@@ -91,7 +83,7 @@ namespace Imgix
         {
             String scheme = UseHttps ? "https" : "http";
             path = path.TrimEnd('/').TrimStart('/');
-            
+
             var qs = GenerateUrlStringFromDict(Parameters);
             var localParams = new Dictionary<String, String>(Parameters);
 
@@ -112,28 +104,28 @@ namespace Imgix
 
         private String GenerateUrlStringFromDict(Dictionary<String, String> queryDictionary)
         {
-            return queryDictionary == null ? 
-                String.Empty : 
-				String.Join("&", queryDictionary.Select(p =>
-					{
-						String encodedKey = WebUtility.UrlEncode(p.Key);
-						encodedKey = encodedKey.Replace("+", "%20");
-						String encodedVal;
+            return queryDictionary == null ?
+                String.Empty :
+                String.Join("&", queryDictionary.Select(p =>
+                    {
+                        String encodedKey = WebUtility.UrlEncode(p.Key);
+                        encodedKey = encodedKey.Replace("+", "%20");
+                        String encodedVal;
 
-						if (p.Key.EndsWith("64")) {
-							Byte[] valBytes = System.Text.Encoding.UTF8.GetBytes(p.Value);
-							encodedVal = System.Convert.ToBase64String(valBytes);
-							encodedVal = encodedVal.Replace("=", "");
-							encodedVal = encodedVal.Replace("/", "_");
-							encodedVal = encodedVal.Replace("+", "-");
-						} else {
-							encodedVal = WebUtility.UrlEncode(p.Value);
-							encodedVal = encodedVal.Replace("+", "%20");
-						}
+                        if (p.Key.EndsWith("64")) {
+                            Byte[] valBytes = System.Text.Encoding.UTF8.GetBytes(p.Value);
+                            encodedVal = System.Convert.ToBase64String(valBytes);
+                            encodedVal = encodedVal.Replace("=", "");
+                            encodedVal = encodedVal.Replace("/", "_");
+                            encodedVal = encodedVal.Replace("+", "-");
+                        } else {
+                            encodedVal = WebUtility.UrlEncode(p.Value);
+                            encodedVal = encodedVal.Replace("+", "%20");
+                        }
 
-						return String.Format("{0}={1}", encodedKey, encodedVal);
-					}
-				));
+                        return String.Format("{0}={1}", encodedKey, encodedVal);
+                    }
+                ));
         }
     }
 }
