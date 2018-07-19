@@ -2,8 +2,11 @@
   <PropertyGroup>
     <TargetFramework>netstandard1.3</TargetFramework>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <RepositoryUrl>https://github.com/cricut/Imgix-CSharp</RepositoryUrl>
+    <PackageReleaseNotes>Moved the Cryptography functionality into this library, removing the dependency on the Cryptography package.</PackageReleaseNotes>
+    <PackageId>Cricut.ImgixClient</PackageId>
   </PropertyGroup>
-  
+    
   <ItemGroup>
     <Compile Include="..\Cryptography\Crc32.cs" Link="Crc32.cs" />
   </ItemGroup>
