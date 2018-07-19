@@ -3,8 +3,8 @@
     <TargetFramework>netstandard1.3</TargetFramework>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
-
+  
   <ItemGroup>
-    <ProjectReference Include="..\Cryptography\Cryptography.csproj" />
+    <Compile Include="..\Cryptography\Crc32.cs" Link="Crc32.cs" />
   </ItemGroup>
 </Project>
