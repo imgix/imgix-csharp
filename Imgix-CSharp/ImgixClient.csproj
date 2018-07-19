@@ -2,6 +2,14 @@
   <PropertyGroup>
     <TargetFramework>netstandard1.3</TargetFramework>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <PackageId>Imgix-CSharp</PackageId>
+    <Title>Imgix CSharp Library</Title>
+    <Authors>raynjamin</Authors>
+    <Description>A library to help you build client urls for imgix.</Description>
+    <Copyright>Copyright 2018</Copyright>
+    <PackageProjectUrl>https://github.com/imgix/imgix-csharp</PackageProjectUrl>
+    <PackageTags>imgix; image; manipulation; library</PackageTags>
+    <RepositoryUrl>https://github.com/imgix/imgix-csharp</RepositoryUrl>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\Cryptography\Crc32.cs" Link="Crc32.cs" />
