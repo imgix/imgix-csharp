@@ -10,7 +10,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Cryptography\Cryptography.csproj" />
     <ProjectReference Include="..\Imgix-CSharp\ImgixClient.csproj" />
   </ItemGroup>
 </Project>
