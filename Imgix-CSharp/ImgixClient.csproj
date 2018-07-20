@@ -12,7 +12,4 @@
     <PackageTags>imgix; image; manipulation; library</PackageTags>
     <RepositoryUrl>https://github.com/imgix/imgix-csharp</RepositoryUrl>
   </PropertyGroup>
-  <ItemGroup>
-    <Compile Include="..\Cryptography\Crc32.cs" Link="Crc32.cs" />
-  </ItemGroup>
 </Project>

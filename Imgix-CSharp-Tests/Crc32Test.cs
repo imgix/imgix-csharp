@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
-using Cryptography;
+using Imgix;
 using NUnit.Framework;
 
-namespace CryptographyTests
+namespace Imgix_Tests
 {
     [TestFixture]
     public class Crc32Test

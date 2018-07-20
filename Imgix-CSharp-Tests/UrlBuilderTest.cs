@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using Cryptography;
 using Imgix;
 using NUnit.Framework;
 
