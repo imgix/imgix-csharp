@@ -1,6 +1,6 @@
 # Imgix-CSharp
 
-[![Build Status](https://travis-ci.org/raynjamin/Imgix-CSharp.svg?branch=master)](https://travis-ci.org/raynjamin/Imgix-CSharp)
+[![Build Status](https://travis-ci.org/imgix/Imgix-CSharp.svg?branch=master)](https://travis-ci.org/imgix/Imgix-CSharp)
 
 imgix URL builder library written in C#. [imgix](http://www.imgix.com/) is an image manipulation framework over HTTP with a variety of benefits.
 
