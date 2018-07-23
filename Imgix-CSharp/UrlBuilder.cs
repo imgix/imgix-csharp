@@ -15,33 +15,68 @@ namespace Imgix
             CYCLE
         }
 
-        public String[] Domains { get; private set; }
-        public Boolean UseHttps { get; private set; }
+        public Boolean UseHttps;
+        public Boolean SignWithLibrary;
+        public ShardStrategyType? ShardStrategy;
 
-        public Dictionary<String, String> Parameters = new Dictionary<string, string>();
+        private String _signKey;
+        public String SignKey { set { _signKey = value; } }
 
-        public String SignKey { get; set; }
-        public ShardStrategyType? ShardStrategy = null;
-        public Boolean SignWithLibrary { get; set; }
+        private String[] Domains;
 
         private int ShardCycleIndex = 0;
 
-        public UrlBuilder(String[] domains, Boolean useHttps = false)
+        public UrlBuilder(String[] domains,
+                          String signKey = null,
+                          ShardStrategyType shardStrategy = ShardStrategyType.CRC,
+                          Boolean signWithLibrary = true,
+                          Boolean useHttps = true)
         {
-            if (ShardStrategy == null)
-            {
-                ShardStrategy = ShardStrategyType.CRC;
-            }
-
+            Domains = (String []) domains.Clone();
+            _signKey = signKey;
+            ShardStrategy = shardStrategy;
+            SignWithLibrary = signWithLibrary;
             UseHttps = useHttps;
-            Domains = domains;
         }
 
-        public UrlBuilder(String domain, Boolean useHttps = false) : this(new[] { domain }, useHttps)
+        public UrlBuilder(String domain,
+                          String signKey = null,
+                          Boolean signWithLibrary = true,
+                          Boolean useHttps = true)
+            : this(new[] { domain },
+                   signKey: signKey,
+                   useHttps: useHttps,
+                   signWithLibrary: signWithLibrary)
         {
         }
+
+        public UrlBuilder(String domain, Boolean useHttps)
+            : this(domain, signKey: null, useHttps: useHttps)
+        {
+        }
+
+        public UrlBuilder(String[] domains, Boolean useHttps)
+            : this(domains, signKey: null, useHttps: useHttps)
+        {
+        }
+
+        public UrlBuilder(String domain, String signKey, Boolean useHttps)
+            : this(domain, signKey: signKey, signWithLibrary: true, useHttps: useHttps)
+        {
+        }
+
+        public UrlBuilder(String[] domains, String signKey, Boolean useHttps)
+            : this(domains, signKey: signKey, signWithLibrary: true, useHttps: useHttps)
+        {
+        }
+
 
         public String BuildUrl(String path)
+        {
+            return BuildUrl(path, new Dictionary<string, string>());
+        }
+
+        public String BuildUrl(String path, Dictionary<String, String> parameters)
         {
 
             if (path.StartsWith("http"))
@@ -54,9 +89,7 @@ namespace Imgix
             if (ShardStrategy == ShardStrategyType.CRC)
             {
                 var c = new Crc32();
-                var hash = c.ComputeCrcHash(path);
-
-                index = ((int)hash)%Domains.Length;
+                index = (int) (c.ComputeCrcHash(path) % Domains.Length);
             }
 
             else if (ShardStrategy == ShardStrategyType.CYCLE)
@@ -64,28 +97,28 @@ namespace Imgix
                 index = (ShardCycleIndex++)%Domains.Length;
             }
 
-            var domain = Domains.ElementAt(index);
+            var domain = Domains[index];
 
             if (SignWithLibrary)
             {
-                Parameters.Add("ixlib", String.Format("csharp-{0}", typeof(UrlBuilder).GetTypeInfo().Assembly.GetName().Version));
+                parameters.Add("ixlib", String.Format("csharp-{0}", typeof(UrlBuilder).GetTypeInfo().Assembly.GetName().Version));
             }
 
-            return GenerateUrl(path, domain);
+            return GenerateUrl(domain, path, parameters);
         }
 
 
-        private String GenerateUrl(String path, String domain)
+        private String GenerateUrl(String domain, String path, Dictionary<String, String> parameters)
         {
             String scheme = UseHttps ? "https" : "http";
             path = path.TrimEnd('/').TrimStart('/');
 
-            var qs = GenerateUrlStringFromDict(Parameters);
-            var localParams = new Dictionary<String, String>(Parameters);
+            var qs = GenerateUrlStringFromDict(parameters);
+            var localParams = new Dictionary<String, String>(parameters);
 
-            if (!String.IsNullOrEmpty(SignKey))
+            if (!String.IsNullOrEmpty(_signKey))
             {
-                var hashString = String.Format("{0}/{1}{2}", SignKey, path, localParams.Any() ? "?" + qs : String.Empty);
+                var hashString = String.Format("{0}/{1}{2}", _signKey, path, localParams.Any() ? "?" + qs : String.Empty);
                 localParams.Add("s", HashString(hashString));
             }
 
