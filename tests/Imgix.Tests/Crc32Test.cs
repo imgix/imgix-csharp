@@ -1,9 +1,7 @@
-﻿using System;
-using System.Linq;
+﻿using NUnit.Framework;
 using Imgix;
-using NUnit.Framework;
 
-namespace Imgix_Tests
+namespace Imgix.Tests
 {
     [TestFixture]
     public class Crc32Test

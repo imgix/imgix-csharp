@@ -2,10 +2,10 @@
   <PropertyGroup>
     <TargetFramework>netstandard1.3</TargetFramework>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <PackageId>Imgix-CSharp</PackageId>
+    <PackageId>Imgix</PackageId>
     <PackageVersion>1.0.2</PackageVersion>
     <Title>Imgix CSharp Library</Title>
-    <Authors>raynjamin</Authors>
+    <Authors>raynjamin; imgix</Authors>
     <Description>A library to help you build client urls for imgix.</Description>
     <Copyright>Copyright 2018</Copyright>
     <PackageProjectUrl>https://github.com/imgix/imgix-csharp</PackageProjectUrl>
