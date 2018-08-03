@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Imgix_CSharp;
+using Imgix;
 using NUnit.Framework;
 
-namespace Imgix_CSharp_Tests
+namespace Imgix_Tests
 {
     /* This fixture exists to show that the library conforms to all requirements as defined in the
      * imgix client blueprint repo here: https://github.com/imgix/imgix-blueprint
