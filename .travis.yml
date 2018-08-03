@@ -2,8 +2,8 @@ language: csharp
 solution: Imgix-CSharp.sln
 
 install:
-  - msbuild /t:Restore Imgix-CSharp.sln
+  - msbuild /t:Restore imgix-csharp.sln
   - nuget install NUnit.Runners -Version 2.6.4 -OutputDirectory testrunner
 script:
-  - msbuild /p:Configuration=Release Imgix-CSharp.sln
-  - mono ./testrunner/NUnit.Runners.2.6.4/tools/nunit-console.exe ./Imgix-CSharp-Tests/bin/Release/net46/ImgixClientTests.dll
+  - msbuild /p:Configuration=Release imgix-csharp.sln
+  - mono ./testrunner/NUnit.Runners.2.6.4/tools/nunit-console.exe ./tests/Imgix.Tests/bin/Release/net46/Imgix.Tests.dll

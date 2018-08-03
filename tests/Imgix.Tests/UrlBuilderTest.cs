@@ -4,7 +4,7 @@ using System.Linq;
 using Imgix;
 using NUnit.Framework;
 
-namespace Imgix_Tests
+namespace Imgix.Tests
 {
     [TestFixture]
     public class UrlBuilderTest

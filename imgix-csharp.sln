@@ -3,14 +3,18 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImgixClient", "Imgix-CSharp\ImgixClient.csproj", "{10B3D578-6CD3-4D65-B2CB-4380803E0E42}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Imgix", "src\Imgix\Imgix.csproj", "{10B3D578-6CD3-4D65-B2CB-4380803E0E42}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImgixClientTests", "Imgix-CSharp-Tests\ImgixClientTests.csproj", "{D0A6445F-5B74-473B-B69D-8D08D0D989F8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Imgix.Tests", "tests\Imgix.Tests\Imgix.Tests.csproj", "{D0A6445F-5B74-473B-B69D-8D08D0D989F8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{A58700D4-72DD-453A-B260-3A144A2D14B8}"
 	ProjectSection(SolutionItems) = preProject
 		.travis.yml = .travis.yml
 	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{AAF88193-B605-40FC-AD40-B38A2633BFA0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{687C888D-5FDA-4B28-9B29-B127CC452FE5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,5 +33,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{10B3D578-6CD3-4D65-B2CB-4380803E0E42} = {AAF88193-B605-40FC-AD40-B38A2633BFA0}
+		{D0A6445F-5B74-473B-B69D-8D08D0D989F8} = {687C888D-5FDA-4B28-9B29-B127CC452FE5}
 	EndGlobalSection
 EndGlobal

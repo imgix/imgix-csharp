@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Imgix;
 using NUnit.Framework;
 
-namespace Imgix_Tests
+namespace Imgix.Tests
 {
     /* This fixture exists to show that the library conforms to all requirements as defined in the
      * imgix client blueprint repo here: https://github.com/imgix/imgix-blueprint
