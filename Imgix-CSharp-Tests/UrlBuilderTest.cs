@@ -116,7 +116,7 @@ namespace Imgix_Tests
 
             var test = new UrlBuilder(domains)
             {
-                ShardStrategy = UrlBuilder.ShardStrategyType.NONE
+                ShardStrategy = null
             };
 
             Assert.AreEqual(test.BuildUrl("gaiman.jpg"), "http://domain.imgix.net/gaiman.jpg");
