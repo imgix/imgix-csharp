@@ -5,46 +5,92 @@
 imgix URL builder library written in C#. [imgix](http://www.imgix.com/) is an image manipulation framework over HTTP with a variety of benefits.
 
 ## Installation
-The library can be installed via NuGet: 
+The latest version of the library can be installed via NuGet:
 
-    Install-Package Imgix-CSharp
+    Install-Package Imgix
 
 Or you can clone this repository and build it.
 
-## Usage
-The library can be invoked by newing up UrlBuilder with your imgix domain. You can optionally pass in a parameter for whether or not you want to use https.
+### Version 1.x
+
+v1.x of the library can be installed via NuGet:
+
+    Install-Package Imgix-CSharp
+
+
+## Basic Usage
+
+You can start creating imgix URLs programmatically through `UrlBuilder` instances. The URL builder can be reused to create URLs for any images on the domains it is provided.
 
 ```csharp
-var builder = new UrlBuilder("domain.imgix.net", useHttps: true);
+using Imgix;
+...
+var builder = new UrlBuilder("domain.imgix.net");
+var parameters = new Dictionary<String, String>();
+parameters["w"] = "400";
+parameters["h"] = "300";
+Debug.Print(builder.BuildUrl("test.jpg", parameters));
+
+// Prints out:
+// https://domain.imgix.net/test.jpg?w=400&h=300
 ```
-    
-The constructor also accepts an array of domains, to support sharding:
+
+## Signed URLs
+
+To produce a signed URL, you must enable secure URLs on your source and then provide your signature key to the URL builder.
 
 ```csharp
-var builder = new UrlBuilder(new [] { "domain.imgix.net", "domain2.imgix.net" }, useHttps: true);
+using Imgix;
+...
+var builder = new UrlBuilder("domain.imgix.net")
+{
+    SignKey = "aaAAbbBB11223344",
+    SignWithLibrary = false
+};
+var parameters = new Dictionary<String, String>();
+parameters["w"] = "500";
+parameters["h"] = "1000";
+Debug.Print(builder.BuildUrl("gaiman.jpg", parameters));
+
+// Prints out:
+// https://domain.imgix.net/gaiman.jpg?w=500&h=1000&s=fc4afbc39b6741560717142aeada876c
 ```
 
-The UrlBuilder uses a dictionary (of key/value strings) called "Parameters" to specify the values you want to pass to imgIX along the queryString.
+## Domain Sharded URLs
+
+Domain sharding enables you to spread image requests across multiple domains. This allows you to bypass the requests-per-host limits of browsers. We recommend 2-3 domain shards maximum if you are going to use domain sharding.
+
+In order to use domain sharding, you need to add multiple domains to your source. You then provide an array of these domains to a builder.
 
 ```csharp
-builder.Parameters.Add("w", "400");
-builder.Parameters.Add("h", "300");
+using Imgix;
+...
+var domains = new [] { "demos-1.imgix.net", "demos-2.imgix.net", "demos-3.imgix.net" };
+var builder = new UrlBuilder(domains);
+var parameters = new Dictionary<String, String>();
+parameters["w"] = "100";
+parameters["h"] = "100";
+Debug.Print(builder.BuildUrl("bridge.png", parameters));
+Debug.Print(builder.BuildUrl("flower.png", parameters));
+
+// Prints out:
+// http://demos-1.imgix.net/bridge.png?h=100&w=100
+// http://demos-2.imgix.net/flower.png?h=100&w=100
 ```
-    
-The UrlBuilder type also offers up a series of Properties:
 
-#### SignKey
-This is the private key for signing requests, as specified in your imgIX source.
+By default, shards are calculated using a checksum so that the image path always resolves to the same domain. This improves caching in the browser.
 
-#### ShardStrategy
-This is the type of sharding you want to use, if you are supporting multiple imgIX domains. Options are CRC, Cycle, or None. If a SignKey is provided, the default is CRC. Cycle will round-robin through the available domains. CRC will build a Crc32 hash of the specified path, and mod it by the number of domains.
+## What is the `ixlib` param on every request?
 
-### SignWithLibrary
-This is a parameter that allows you further sign your requests with the current version of the Imgix-CSharp library.
+For security and diagnostic purposes, we sign all requests with the language and version of library used to generate the URL.
 
-Finally, to construct your url, call BuildUrl() on your builder object, with the image path as your sole parameter:
+This can be disabled by passing `false` for the `signWithLibrary` option to `new UrlBuilder`:
 
 ```csharp
-builder.BuildUrl("/users/1.png") // http://domain.imgix.net/users/1.png
+using Imgix;
+...
+var builder = new UrlBuilder("domain.imgix.net", signWithLibrary: false);
 ```
 
+## Code of Conduct
+Users contributing to or participating in the development of this project are subject to the terms of imgix's [Code of Conduct](https://github.com/imgix/code-of-conduct).
