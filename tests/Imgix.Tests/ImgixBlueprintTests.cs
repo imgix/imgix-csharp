@@ -18,7 +18,7 @@ namespace Imgix.Tests
         [Test]
         public void UrlBuilderHandlesBasicPathsProperly()
         {
-            var test = new UrlBuilder("my-social-network.imgix.net", useHttps: true, signWithLibrary: false);
+            var test = new UrlBuilder("my-social-network.imgix.net", useHttps: true, includeLibraryParam: false);
 
             Assert.AreEqual("https://my-social-network.imgix.net/users/1.png", test.BuildUrl("/users/1.png"));
         }
@@ -26,7 +26,7 @@ namespace Imgix.Tests
         [Test]
         public void UrlBuilderDoesnotMerelyAppend()
         {
-            var test = new UrlBuilder("my-social-network.imgix.net", useHttps: true, signWithLibrary: false);
+            var test = new UrlBuilder("my-social-network.imgix.net", useHttps: true, includeLibraryParam: false);
 
             Assert.AreNotEqual("https://my-social-network.imgix.net/http://avatars.com/john-smith.png", test.BuildUrl("http://avatars.com/john-smith.png"));
         }
@@ -34,7 +34,7 @@ namespace Imgix.Tests
         [Test]
         public void UrlBuilderProperlyEncodesAbsolutePaths()
         {
-            var test = new UrlBuilder("my-social-network.imgix.net", useHttps: true, signWithLibrary: false);
+            var test = new UrlBuilder("my-social-network.imgix.net", useHttps: true, includeLibraryParam: false);
 
             Assert.AreEqual("https://my-social-network.imgix.net/http%3A%2F%2Favatars.com%2Fjohn-smith.png", test.BuildUrl("http://avatars.com/john-smith.png"));
         }
@@ -42,7 +42,7 @@ namespace Imgix.Tests
         [Test]
         public void UrlBuilderAppendsQueryStringParameters()
         {
-            var test = new UrlBuilder("my-social-network.imgix.net", useHttps: true, signWithLibrary: false);
+            var test = new UrlBuilder("my-social-network.imgix.net", useHttps: true, includeLibraryParam: false);
 
             var parameters = new Dictionary<String, String>();
             parameters.Add("w", "400");
@@ -54,7 +54,7 @@ namespace Imgix.Tests
         [Test]
         public void UrlBuilderProperlySignsSimpleRequests()
         {
-            var test = new UrlBuilder("my-social-network.imgix.net", useHttps: true, signKey: "FOO123bar", signWithLibrary: false);
+            var test = new UrlBuilder("my-social-network.imgix.net", useHttps: true, signKey: "FOO123bar", includeLibraryParam: false);
 
             Assert.AreEqual("https://my-social-network.imgix.net/users/1.png?s=6797c24146142d5b40bde3141fd3600c", test.BuildUrl("/users/1.png"));
         }
@@ -62,7 +62,7 @@ namespace Imgix.Tests
         [Test]
         public void UrlBuilderProperlySignsFullyQualifiedUrls()
         {
-            var test = new UrlBuilder("my-social-network.imgix.net", useHttps: true, signKey:  "FOO123bar", signWithLibrary: false);
+            var test = new UrlBuilder("my-social-network.imgix.net", useHttps: true, signKey:  "FOO123bar", includeLibraryParam: false);
 
             Assert.AreEqual("https://my-social-network.imgix.net/http%3A%2F%2Favatars.com%2Fjohn-smith.png?s=493a52f008c91416351f8b33d4883135", test.BuildUrl("/http%3A%2F%2Favatars.com%2Fjohn-smith.png"));
         }
@@ -70,7 +70,7 @@ namespace Imgix.Tests
         [Test]
         public void UrlBuilderProperlySignsSimplePathsWithParameters()
         {
-            var test = new UrlBuilder("my-social-network.imgix.net", useHttps: true, signKey:  "FOO123bar", signWithLibrary: false);
+            var test = new UrlBuilder("my-social-network.imgix.net", useHttps: true, signKey:  "FOO123bar", includeLibraryParam: false);
 
             var parameters = new Dictionary<String, String>();
             parameters.Add("w", "400");
@@ -83,7 +83,7 @@ namespace Imgix.Tests
         [Test]
         public void UrlBuilderProperlySignsFullyQualifiedUrlsWithParameters()
         {
-            var test = new UrlBuilder("my-social-network.imgix.net", useHttps: true, signKey: "FOO123bar", signWithLibrary: false);
+            var test = new UrlBuilder("my-social-network.imgix.net", useHttps: true, signKey: "FOO123bar", includeLibraryParam: false);
 
             var parameters = new Dictionary<String, String>();
             parameters.Add("w", "400");
