@@ -45,7 +45,7 @@ using Imgix;
 var builder = new UrlBuilder("domain.imgix.net")
 {
     SignKey = "aaAAbbBB11223344",
-    SignWithLibrary = false
+    IncludeLibraryParam = false
 };
 var parameters = new Dictionary<String, String>();
 parameters["w"] = "500";
@@ -84,12 +84,12 @@ By default, shards are calculated using a checksum so that the image path always
 
 For security and diagnostic purposes, we sign all requests with the language and version of library used to generate the URL.
 
-This can be disabled by passing `false` for the `signWithLibrary` option to `new UrlBuilder`:
+This can be disabled by passing `false` for the `includeLibraryParam` option to `new UrlBuilder`:
 
 ```csharp
 using Imgix;
 ...
-var builder = new UrlBuilder("domain.imgix.net", signWithLibrary: false);
+var builder = new UrlBuilder("domain.imgix.net", includeLibraryParam: false);
 ```
 
 ## Code of Conduct

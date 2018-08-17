@@ -14,7 +14,7 @@ namespace Imgix.Tests
         [Test]
         public void UrlBuilderBuildsBasicUrlHttp()
         {
-            var test = new UrlBuilder("domain.imgix.net", signWithLibrary: false);
+            var test = new UrlBuilder("domain.imgix.net", includeLibraryParam: false);
 
             Assert.AreEqual(test.BuildUrl("gaiman.jpg"), "https://domain.imgix.net/gaiman.jpg");
         }
@@ -22,7 +22,7 @@ namespace Imgix.Tests
         [Test]
         public void UrlBuilderBuildsBasicUrlHttps()
         {
-            var test = new UrlBuilder("domain.imgix.net", useHttps: true, signWithLibrary: false);
+            var test = new UrlBuilder("domain.imgix.net", useHttps: true, includeLibraryParam: false);
 
             Assert.AreEqual(test.BuildUrl("gaiman.jpg"), "https://domain.imgix.net/gaiman.jpg");
         }
@@ -30,7 +30,7 @@ namespace Imgix.Tests
         [Test]
         public void UrlBuilderBuildsQueryStringUrlHttp()
         {
-            var test = new UrlBuilder("domain.imgix.net", signWithLibrary: false);
+            var test = new UrlBuilder("domain.imgix.net", includeLibraryParam: false);
 
             var parameters = new Dictionary<String, String>();
             parameters["w"] = "500";
@@ -42,7 +42,7 @@ namespace Imgix.Tests
         [Test]
         public void UrlBuilderBuildsQueryStringUrlHttps()
         {
-            var test = new UrlBuilder("domain.imgix.net", useHttps: true, signWithLibrary: false);
+            var test = new UrlBuilder("domain.imgix.net", useHttps: true, includeLibraryParam: false);
 
             var parameters = new Dictionary<String, String>();
             parameters["w"] = "500";
@@ -55,7 +55,7 @@ namespace Imgix.Tests
         public void UrlBuilderUsesCRCShardingBydefault()
         {
             var domains = new [] { "domain1.imgix.net",  "domain2.imgix.net" };
-            var test = new UrlBuilder(domains, signWithLibrary: false);
+            var test = new UrlBuilder(domains, includeLibraryParam: false);
 
             Assert.True(test.BuildUrl("/users/1.png").Contains(domains[0]));
             Assert.True(test.BuildUrl("/users/1.png").Contains(domains[0]));
@@ -71,7 +71,7 @@ namespace Imgix.Tests
         public void UrlBuilderClonesDomainList()
         {
             var domains = new[] { "domain1.imgix.net", "domain2.imgix.net" };
-            var test = new UrlBuilder(domains, signWithLibrary: false);
+            var test = new UrlBuilder(domains, includeLibraryParam: false);
             domains[0] = "domain3.imgix.net";
             domains[1] = "domain4.imgix.net";
 
@@ -88,7 +88,7 @@ namespace Imgix.Tests
         [Test]
         public void UrlBuilderSignsParameterlessRequests()
         {
-            var test = new UrlBuilder("domain.imgix.net", signKey: SignKey, signWithLibrary: false);
+            var test = new UrlBuilder("domain.imgix.net", signKey: SignKey, includeLibraryParam: false);
 
             Assert.AreEqual(test.BuildUrl("gaiman.jpg"), "https://domain.imgix.net/gaiman.jpg?s=db6110637ad768e4b1d503cb96e6439a");
         }
@@ -96,7 +96,7 @@ namespace Imgix.Tests
         [Test]
         public void UrlBuilderSignsParameteredRequests()
         {
-            var test = new UrlBuilder("domain.imgix.net", signKey: SignKey, signWithLibrary: false);
+            var test = new UrlBuilder("domain.imgix.net", signKey: SignKey, includeLibraryParam: false);
 
             var parameters = new Dictionary<String, String>();
             parameters.Add("w", "500");
@@ -108,7 +108,7 @@ namespace Imgix.Tests
         [Test]
         public void UrlBuilderSignsNestedPaths()
         {
-            var test = new UrlBuilder("domain.imgix.net", signKey: SignKey, signWithLibrary: false);
+            var test = new UrlBuilder("domain.imgix.net", signKey: SignKey, includeLibraryParam: false);
 
             Assert.AreEqual(test.BuildUrl("test/gaiman.jpg"), "https://domain.imgix.net/test/gaiman.jpg?s=51033c27726f19c0f8229a1ed2dc8523");
         }
@@ -118,7 +118,7 @@ namespace Imgix.Tests
         {
             var domains = new[] { "domain.imgix.net", "domain2.imgix.net", "domain3.imgix.net" };
 
-            var test = new UrlBuilder(domains, signWithLibrary: false)
+            var test = new UrlBuilder(domains, includeLibraryParam: false)
             {
                 ShardStrategy = null
             };
@@ -133,7 +133,7 @@ namespace Imgix.Tests
         {
             var domains = new[] {"domain.imgix.net", "domain2.imgix.net", "domain3.imgix.net"};
 
-            var test = new UrlBuilder(domains, shardStrategy: UrlBuilder.ShardStrategyType.CYCLE, signWithLibrary: false);
+            var test = new UrlBuilder(domains, shardStrategy: UrlBuilder.ShardStrategyType.CYCLE, includeLibraryParam: false);
 
             Assert.AreEqual(test.BuildUrl("gaiman.jpg"), "https://domain.imgix.net/gaiman.jpg");
             Assert.AreEqual(test.BuildUrl("gaiman.jpg"), "https://domain2.imgix.net/gaiman.jpg");
@@ -147,7 +147,7 @@ namespace Imgix.Tests
             var domains = new[] { "domain.imgix.net", "domain2.imgix.net", "domain3.imgix.net" };
             var crcs = new [] { "test1.png", "test2.png", "test3.png" }.Select(i => Convert.ToInt32(new Crc32().ComputeCrcHash(i) % domains.Length)).ToArray();
 
-            var test = new UrlBuilder(domains, shardStrategy: UrlBuilder.ShardStrategyType.CRC, signWithLibrary: false);
+            var test = new UrlBuilder(domains, shardStrategy: UrlBuilder.ShardStrategyType.CRC, includeLibraryParam: false);
 
             Assert.AreEqual(test.BuildUrl("test1.png"), String.Format("https://{0}/test1.png", domains[crcs[0]]));
             Assert.AreEqual(test.BuildUrl("test2.png"), String.Format("https://{0}/test2.png", domains[crcs[1]]));
@@ -157,7 +157,7 @@ namespace Imgix.Tests
         [Test]
         public void UrlBuilderEscapesParamKeys()
         {
-            var test = new UrlBuilder("demo.imgix.net", signWithLibrary: false);
+            var test = new UrlBuilder("demo.imgix.net", includeLibraryParam: false);
 
             var parameters = new Dictionary<String, String>();
             parameters["hello world"] = "interesting";
@@ -168,7 +168,7 @@ namespace Imgix.Tests
         [Test]
         public void UrlBuilderEscapesParamValues()
         {
-            var test = new UrlBuilder("demo.imgix.net", signWithLibrary: false);
+            var test = new UrlBuilder("demo.imgix.net", includeLibraryParam: false);
 
             var parameters = new Dictionary<String, String>();
             parameters["hello_world"] = "/foo\"> <script>alert(\"hacked\")</script><";
@@ -179,7 +179,7 @@ namespace Imgix.Tests
         [Test]
         public void UrlBuilderBase64EncodesBase64ParamVariants()
         {
-            var test = new UrlBuilder("demo.imgix.net", signWithLibrary: false);
+            var test = new UrlBuilder("demo.imgix.net", includeLibraryParam: false);
 
             var parameters = new Dictionary<String, String>();
             parameters["txt64"] = "I cannøt belîév∑ it wors! \ud83d\ude31";

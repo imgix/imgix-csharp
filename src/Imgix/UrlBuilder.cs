@@ -16,7 +16,7 @@ namespace Imgix
         }
 
         public Boolean UseHttps;
-        public Boolean SignWithLibrary;
+        public Boolean IncludeLibraryParam;
         public ShardStrategyType? ShardStrategy;
 
         private String _signKey;
@@ -29,24 +29,24 @@ namespace Imgix
         public UrlBuilder(String[] domains,
                           String signKey = null,
                           ShardStrategyType shardStrategy = ShardStrategyType.CRC,
-                          Boolean signWithLibrary = true,
+                          Boolean includeLibraryParam = true,
                           Boolean useHttps = true)
         {
             Domains = (String []) domains.Clone();
             _signKey = signKey;
             ShardStrategy = shardStrategy;
-            SignWithLibrary = signWithLibrary;
+            IncludeLibraryParam = includeLibraryParam;
             UseHttps = useHttps;
         }
 
         public UrlBuilder(String domain,
                           String signKey = null,
-                          Boolean signWithLibrary = true,
+                          Boolean includeLibraryParam = true,
                           Boolean useHttps = true)
             : this(new[] { domain },
                    signKey: signKey,
                    useHttps: useHttps,
-                   signWithLibrary: signWithLibrary)
+                   includeLibraryParam: includeLibraryParam)
         {
         }
 
@@ -61,12 +61,12 @@ namespace Imgix
         }
 
         public UrlBuilder(String domain, String signKey, Boolean useHttps)
-            : this(domain, signKey: signKey, signWithLibrary: true, useHttps: useHttps)
+            : this(domain, signKey: signKey, includeLibraryParam: true, useHttps: useHttps)
         {
         }
 
         public UrlBuilder(String[] domains, String signKey, Boolean useHttps)
-            : this(domains, signKey: signKey, signWithLibrary: true, useHttps: useHttps)
+            : this(domains, signKey: signKey, includeLibraryParam: true, useHttps: useHttps)
         {
         }
 
@@ -99,7 +99,7 @@ namespace Imgix
 
             var domain = Domains[index];
 
-            if (SignWithLibrary)
+            if (IncludeLibraryParam)
             {
                 parameters.Add("ixlib", String.Format("csharp-{0}", typeof(UrlBuilder).GetTypeInfo().Assembly.GetName().Version));
             }
