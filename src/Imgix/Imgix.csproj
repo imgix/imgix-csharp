@@ -3,7 +3,7 @@
     <TargetFramework>netstandard1.3</TargetFramework>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <PackageId>Imgix</PackageId>
-    <PackageVersion>1.0.2</PackageVersion>
+    <PackageVersion>2.0.0</PackageVersion>
     <Title>Imgix CSharp Library</Title>
     <Authors>raynjamin; imgix</Authors>
     <Description>A library to help you build client urls for imgix.</Description>
