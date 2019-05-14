@@ -186,5 +186,12 @@ namespace Imgix.Tests
 
             Assert.AreEqual("https://demo.imgix.net/~text?txt64=SSBjYW5uw7h0IGJlbMOuw6l24oiRIGl0IHdvcu-jv3MhIPCfmLE", test.BuildUrl("~text", parameters));
         }
+
+        [Test]
+        public void UrlBuilderGeneratesIxLibParam()
+        {
+            var test = new UrlBuilder("demo.imgix.net", includeLibraryParam: true);
+            Assert.AreEqual(String.Format("https://demo.imgix.net/demo.png?ixlib=csharp-{0}", typeof(UrlBuilder).Assembly.GetName().Version), test.BuildUrl("demo.png"));
+        }
     }
 }
