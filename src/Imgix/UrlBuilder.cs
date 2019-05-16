@@ -26,6 +26,7 @@ namespace Imgix
 
         private int ShardCycleIndex = 0;
 
+        [Obsolete("Warning: Domain sharding has been deprecated and will be removed in the next major version.")]
         public UrlBuilder(String[] domains,
                           String signKey = null,
                           ShardStrategyType shardStrategy = ShardStrategyType.CRC,
@@ -55,6 +56,7 @@ namespace Imgix
         {
         }
 
+        [Obsolete("Warning: Domain sharding has been deprecated and will be removed in the next major version.")]
         public UrlBuilder(String[] domains, Boolean useHttps)
             : this(domains, signKey: null, useHttps: useHttps)
         {
@@ -65,6 +67,7 @@ namespace Imgix
         {
         }
 
+        [Obsolete("Warning: Domain sharding has been deprecated and will be removed in the next major version.")]
         public UrlBuilder(String[] domains, String signKey, Boolean useHttps)
             : this(domains, signKey: signKey, includeLibraryParam: true, useHttps: useHttps)
         {

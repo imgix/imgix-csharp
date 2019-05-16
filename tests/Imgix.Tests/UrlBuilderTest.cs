@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Imgix;
 using NUnit.Framework;
 
@@ -192,6 +193,34 @@ namespace Imgix.Tests
         {
             var test = new UrlBuilder("demo.imgix.net", includeLibraryParam: true);
             Assert.AreEqual(String.Format("https://demo.imgix.net/demo.png?ixlib=csharp-{0}", typeof(UrlBuilder).Assembly.GetName().Version), test.BuildUrl("demo.png"));
+        }
+
+        [Test]
+        public void UrlBuilderObsoleteConstructor1()
+        {
+            Type[] constructorParameters = new Type[] { typeof(String[]), typeof(String), typeof(UrlBuilder.ShardStrategyType),
+                                                        typeof(Boolean), typeof(Boolean) };
+            Assert.IsTrue(ConstructorHasObsoleteAttribute(constructorParameters));
+        }
+
+        [Test]
+        public void UrlBuilderObsoleteConstructor2()
+        {
+            Type[] constructorParameters = new Type[] { typeof(String[]), typeof(Boolean) };
+            Assert.IsTrue(ConstructorHasObsoleteAttribute(constructorParameters));
+        }
+
+        [Test]
+        public void UrlBuilderObsoleteConstructor3()
+        {
+            Type[] constructorParameters = new Type[] { typeof(String[]), typeof(String), typeof(Boolean) };
+            Assert.IsTrue(ConstructorHasObsoleteAttribute(constructorParameters));
+        }
+
+        private Boolean ConstructorHasObsoleteAttribute(Type[] constructorParameters)
+        {
+            ConstructorInfo ci = typeof(UrlBuilder).GetConstructor(constructorParameters);
+            return ci.GetCustomAttribute(typeof(ObsoleteAttribute)) != null;
         }
     }
 }
