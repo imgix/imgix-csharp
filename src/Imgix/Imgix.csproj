@@ -3,9 +3,9 @@
     <TargetFramework>netstandard1.3</TargetFramework>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <PackageId>Imgix</PackageId>
-    <PackageVersion>2.0.0</PackageVersion>
+    <PackageVersion>2.1.0</PackageVersion>
     <Title>Imgix CSharp Library</Title>
-    <Authors>raynjamin; imgix</Authors>
+    <Authors>raynjamin; imgix; sherwinski</Authors>
     <Description>A library to help you build client urls for imgix.</Description>
     <Copyright>Copyright 2018</Copyright>
     <PackageProjectUrl>https://github.com/imgix/imgix-csharp</PackageProjectUrl>
