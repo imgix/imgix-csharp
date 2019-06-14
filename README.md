@@ -56,32 +56,6 @@ Debug.Print(builder.BuildUrl("gaiman.jpg", parameters));
 // https://domain.imgix.net/gaiman.jpg?w=500&h=1000&s=fc4afbc39b6741560717142aeada876c
 ```
 
-## Domain Sharded URLs
-**Warning: Domain Sharding has been deprecated and will be removed in the next major release**<br>
-To find out more, see our [blog post](https://blog.imgix.com/2019/05/03/deprecating-domain-sharding) explaining the decision to remove this feature.
-
-Domain sharding enables you to spread image requests across multiple domains. This allows you to bypass the requests-per-host limits of browsers. We recommend 2-3 domain shards maximum if you are going to use domain sharding.
-
-In order to use domain sharding, you need to add multiple domains to your source. You then provide an array of these domains to a builder.
-
-```csharp
-using Imgix;
-...
-var domains = new [] { "demos-1.imgix.net", "demos-2.imgix.net", "demos-3.imgix.net" };
-var builder = new UrlBuilder(domains);
-var parameters = new Dictionary<String, String>();
-parameters["w"] = "100";
-parameters["h"] = "100";
-Debug.Print(builder.BuildUrl("bridge.png", parameters));
-Debug.Print(builder.BuildUrl("flower.png", parameters));
-
-// Prints out:
-// http://demos-1.imgix.net/bridge.png?h=100&w=100
-// http://demos-2.imgix.net/flower.png?h=100&w=100
-```
-
-By default, shards are calculated using a checksum so that the image path always resolves to the same domain. This improves caching in the browser.
-
 ## What is the `ixlib` param on every request?
 
 For security and diagnostic purposes, we sign all requests with the language and version of library used to generate the URL.
