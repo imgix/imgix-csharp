@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using Imgix;
 using NUnit.Framework;
 
 namespace Imgix.Tests
@@ -53,40 +50,6 @@ namespace Imgix.Tests
         }
 
         [Test]
-        public void UrlBuilderUsesCRCShardingBydefault()
-        {
-            var domains = new [] { "domain1.imgix.net",  "domain2.imgix.net" };
-            var test = new UrlBuilder(domains, includeLibraryParam: false);
-
-            Assert.True(test.BuildUrl("/users/1.png").Contains(domains[0]));
-            Assert.True(test.BuildUrl("/users/1.png").Contains(domains[0]));
-            Assert.True(test.BuildUrl("/users/2.png").Contains(domains[0]));
-            Assert.True(test.BuildUrl("/users/2.png").Contains(domains[0]));
-            Assert.True(test.BuildUrl("/users/a.png").Contains(domains[1]));
-            Assert.True(test.BuildUrl("/users/a.png").Contains(domains[1]));
-            Assert.True(test.BuildUrl("/users/a.png").Contains(domains[1]));
-            Assert.True(test.BuildUrl("/users/a.png").Contains(domains[1]));
-        }
-
-        [Test]
-        public void UrlBuilderClonesDomainList()
-        {
-            var domains = new[] { "domain1.imgix.net", "domain2.imgix.net" };
-            var test = new UrlBuilder(domains, includeLibraryParam: false);
-            domains[0] = "domain3.imgix.net";
-            domains[1] = "domain4.imgix.net";
-
-            Assert.False(test.BuildUrl("/users/1.png").Contains(domains[0]));
-            Assert.False(test.BuildUrl("/users/1.png").Contains(domains[0]));
-            Assert.False(test.BuildUrl("/users/2.png").Contains(domains[0]));
-            Assert.False(test.BuildUrl("/users/2.png").Contains(domains[0]));
-            Assert.False(test.BuildUrl("/users/a.png").Contains(domains[1]));
-            Assert.False(test.BuildUrl("/users/a.png").Contains(domains[1]));
-            Assert.False(test.BuildUrl("/users/a.png").Contains(domains[1]));
-            Assert.False(test.BuildUrl("/users/a.png").Contains(domains[1]));
-        }
-
-        [Test]
         public void UrlBuilderSignsParameterlessRequests()
         {
             var test = new UrlBuilder("domain.imgix.net", signKey: SignKey, includeLibraryParam: false);
@@ -112,47 +75,6 @@ namespace Imgix.Tests
             var test = new UrlBuilder("domain.imgix.net", signKey: SignKey, includeLibraryParam: false);
 
             Assert.AreEqual(test.BuildUrl("test/gaiman.jpg"), "https://domain.imgix.net/test/gaiman.jpg?s=51033c27726f19c0f8229a1ed2dc8523");
-        }
-
-        [Test]
-        public void UrlBuilderWithMultipleDomainsPicksTheFirstWhenShardTypeNull()
-        {
-            var domains = new[] { "domain.imgix.net", "domain2.imgix.net", "domain3.imgix.net" };
-
-            var test = new UrlBuilder(domains, includeLibraryParam: false)
-            {
-                ShardStrategy = null
-            };
-
-            Assert.AreEqual(test.BuildUrl("/users/1.png"), "https://domain.imgix.net/users/1.png");
-            Assert.AreEqual(test.BuildUrl("/users/2.png"), "https://domain.imgix.net/users/2.png");
-            Assert.AreEqual(test.BuildUrl("/users/a.png"), "https://domain.imgix.net/users/a.png");
-        }
-
-        [Test]
-        public void UrlBuilderWithMultipleDomainCyclesThroughDomains()
-        {
-            var domains = new[] {"domain.imgix.net", "domain2.imgix.net", "domain3.imgix.net"};
-
-            var test = new UrlBuilder(domains, shardStrategy: UrlBuilder.ShardStrategyType.CYCLE, includeLibraryParam: false);
-
-            Assert.AreEqual(test.BuildUrl("gaiman.jpg"), "https://domain.imgix.net/gaiman.jpg");
-            Assert.AreEqual(test.BuildUrl("gaiman.jpg"), "https://domain2.imgix.net/gaiman.jpg");
-            Assert.AreEqual(test.BuildUrl("gaiman.jpg"), "https://domain3.imgix.net/gaiman.jpg");
-            Assert.AreEqual(test.BuildUrl("gaiman.jpg"), "https://domain.imgix.net/gaiman.jpg");
-        }
-
-        [Test]
-        public void UrlBuilderWithMultipleDomainsSelectsServerByCRC()
-        {
-            var domains = new[] { "domain.imgix.net", "domain2.imgix.net", "domain3.imgix.net" };
-            var crcs = new [] { "test1.png", "test2.png", "test3.png" }.Select(i => Convert.ToInt32(new Crc32().ComputeCrcHash(i) % domains.Length)).ToArray();
-
-            var test = new UrlBuilder(domains, shardStrategy: UrlBuilder.ShardStrategyType.CRC, includeLibraryParam: false);
-
-            Assert.AreEqual(test.BuildUrl("test1.png"), String.Format("https://{0}/test1.png", domains[crcs[0]]));
-            Assert.AreEqual(test.BuildUrl("test2.png"), String.Format("https://{0}/test2.png", domains[crcs[1]]));
-            Assert.AreEqual(test.BuildUrl("test3.png"), String.Format("https://{0}/test3.png", domains[crcs[2]]));
         }
 
         [Test]
@@ -193,34 +115,6 @@ namespace Imgix.Tests
         {
             var test = new UrlBuilder("demo.imgix.net", includeLibraryParam: true);
             Assert.AreEqual(String.Format("https://demo.imgix.net/demo.png?ixlib=csharp-{0}", typeof(UrlBuilder).Assembly.GetName().Version), test.BuildUrl("demo.png"));
-        }
-
-        [Test]
-        public void UrlBuilderObsoleteConstructor1()
-        {
-            Type[] constructorParameters = new Type[] { typeof(String[]), typeof(String), typeof(UrlBuilder.ShardStrategyType),
-                                                        typeof(Boolean), typeof(Boolean) };
-            Assert.IsTrue(ConstructorHasObsoleteAttribute(constructorParameters));
-        }
-
-        [Test]
-        public void UrlBuilderObsoleteConstructor2()
-        {
-            Type[] constructorParameters = new Type[] { typeof(String[]), typeof(Boolean) };
-            Assert.IsTrue(ConstructorHasObsoleteAttribute(constructorParameters));
-        }
-
-        [Test]
-        public void UrlBuilderObsoleteConstructor3()
-        {
-            Type[] constructorParameters = new Type[] { typeof(String[]), typeof(String), typeof(Boolean) };
-            Assert.IsTrue(ConstructorHasObsoleteAttribute(constructorParameters));
-        }
-
-        private Boolean ConstructorHasObsoleteAttribute(Type[] constructorParameters)
-        {
-            ConstructorInfo ci = typeof(UrlBuilder).GetConstructor(constructorParameters);
-            return ci.GetCustomAttribute(typeof(ObsoleteAttribute)) != null;
         }
     }
 }

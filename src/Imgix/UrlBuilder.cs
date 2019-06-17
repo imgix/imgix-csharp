@@ -9,46 +9,23 @@ namespace Imgix
 {
     public class UrlBuilder
     {
-        public enum ShardStrategyType
-        {
-            CRC,
-            CYCLE
-        }
-
         public Boolean UseHttps;
         public Boolean IncludeLibraryParam;
-        public ShardStrategyType? ShardStrategy;
 
         private String _signKey;
         public String SignKey { set { _signKey = value; } }
 
-        private String[] Domains;
-
-        private int ShardCycleIndex = 0;
-
-        [Obsolete("Warning: Domain sharding has been deprecated and will be removed in the next major version.")]
-        public UrlBuilder(String[] domains,
-                          String signKey = null,
-                          ShardStrategyType shardStrategy = ShardStrategyType.CRC,
-                          Boolean includeLibraryParam = true,
-                          Boolean useHttps = true)
-        {
-            Domains = (String []) domains.Clone();
-            _signKey = signKey;
-            ShardStrategy = shardStrategy;
-            IncludeLibraryParam = includeLibraryParam;
-            UseHttps = useHttps;
-        }
+        private String Domain;
 
         public UrlBuilder(String domain,
                           String signKey = null,
                           Boolean includeLibraryParam = true,
                           Boolean useHttps = true)
-            : this(new[] { domain },
-                   signKey: signKey,
-                   useHttps: useHttps,
-                   includeLibraryParam: includeLibraryParam)
         {
+            Domain = domain;
+            _signKey = signKey;
+            IncludeLibraryParam = includeLibraryParam;
+            UseHttps = useHttps;
         }
 
         public UrlBuilder(String domain, Boolean useHttps)
@@ -56,23 +33,10 @@ namespace Imgix
         {
         }
 
-        [Obsolete("Warning: Domain sharding has been deprecated and will be removed in the next major version.")]
-        public UrlBuilder(String[] domains, Boolean useHttps)
-            : this(domains, signKey: null, useHttps: useHttps)
-        {
-        }
-
         public UrlBuilder(String domain, String signKey, Boolean useHttps)
             : this(domain, signKey: signKey, includeLibraryParam: true, useHttps: useHttps)
         {
         }
-
-        [Obsolete("Warning: Domain sharding has been deprecated and will be removed in the next major version.")]
-        public UrlBuilder(String[] domains, String signKey, Boolean useHttps)
-            : this(domains, signKey: signKey, includeLibraryParam: true, useHttps: useHttps)
-        {
-        }
-
 
         public String BuildUrl(String path)
         {
@@ -87,27 +51,12 @@ namespace Imgix
                 path = WebUtility.UrlEncode(path);
             }
 
-            int index = 0;
-
-            if (ShardStrategy == ShardStrategyType.CRC)
-            {
-                var c = new Crc32();
-                index = (int) (c.ComputeCrcHash(path) % Domains.Length);
-            }
-
-            else if (ShardStrategy == ShardStrategyType.CYCLE)
-            {
-                index = (ShardCycleIndex++)%Domains.Length;
-            }
-
-            var domain = Domains[index];
-
             if (IncludeLibraryParam)
             {
                 parameters.Add("ixlib", String.Format("csharp-{0}", typeof(UrlBuilder).GetTypeInfo().Assembly.GetName().Version));
             }
 
-            return GenerateUrl(domain, path, parameters);
+            return GenerateUrl(Domain, path, parameters);
         }
 
 
