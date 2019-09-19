@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -107,6 +108,22 @@ namespace Imgix
                         return String.Format("{0}={1}", encodedKey, encodedVal);
                     }
                 ));
+        }
+
+        private List<int> targetWidths() {
+            List<int> resolutions = new List<int>();
+            int MAX_SIZE = 8192, roundedPrev;
+            double SRCSET_INCREMENT_PERCENTAGE = 8;
+            double prev = 100;
+
+            while (prev <= MAX_SIZE)
+            {
+                resolutions.Add((int)(2 * Math.Round(prev / 2)));
+                prev *= 1 + (SRCSET_INCREMENT_PERCENTAGE / 100) * 2;
+            }
+            resolutions.Add(MAX_SIZE);
+
+            return resolutions;
         }
     }
 }
