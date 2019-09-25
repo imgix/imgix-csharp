@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -17,6 +16,7 @@ namespace Imgix
         public String SignKey { set { _signKey = value; } }
 
         private String Domain;
+        //private const List<int> SRCSET_TARGET_WIDTHS = GenerateTargetWidths();
 
         public UrlBuilder(String domain,
                           String signKey = null,
@@ -60,6 +60,29 @@ namespace Imgix
             return GenerateUrl(Domain, path, parameters);
         }
 
+        public String BuildSrcSet(String path)
+        {
+            return BuildSrcSet(path, new Dictionary<string, string>());
+        }
+
+        public String BuildSrcSet(String path, Dictionary<String, String> parameters)
+        {
+            String srcset;
+            parameters.TryGetValue("w", out String width);
+            parameters.TryGetValue("h", out String height);
+            parameters.TryGetValue("ar", out String aspectRatio);
+
+            if ((width != null) || (height != null && aspectRatio != null))
+            {
+                srcset = GenerateSrcSetDPR(Domain, path, parameters);
+            }
+            else
+            {
+                srcset = GenerateSrcSetPairs(Domain, path, parameters);
+            }
+
+            return srcset;
+        }
 
         private String GenerateUrl(String domain, String path, Dictionary<String, String> parameters)
         {
@@ -78,6 +101,51 @@ namespace Imgix
             return String.Format("{0}://{1}/{2}{3}", scheme, domain, path, localParams.Any() ? "?" + GenerateUrlStringFromDict(localParams) : String.Empty);
         }
 
+        private String GenerateSrcSetDPR(String domain, String path, Dictionary<String, String> parameters)
+        {
+            String srcset = "";
+            int[] targetRatios = { 1, 2, 3, 4, 5 };
+
+            foreach(int ratio in targetRatios)
+            {
+                parameters.Add("dpr", ratio.ToString());
+                srcset += BuildUrl(path, parameters) + " " + "x,\n";
+            }
+
+            return srcset.Substring(0, srcset.Length - 2);
+        }
+
+        private String GenerateSrcSetPairs(String domain, String path, Dictionary<String, String> parameters)
+        {
+            String srcset = "";
+            List<int> SRCSET_TARGET_WIDTHS = GenerateTargetWidths();
+
+            foreach(int width in SRCSET_TARGET_WIDTHS)
+            {
+                parameters.Add("w", width.ToString());
+                srcset += BuildUrl(path, parameters) + " " + width + "w,\n";
+            }
+
+            return srcset.Substring(0, srcset.Length - 2);
+        }
+
+        private List<int> GenerateTargetWidths()
+        {
+            List<int> resolutions = new List<int>();
+            int MAX_SIZE = 8192, roundedPrev;
+            double SRCSET_PERCENT_INCREMENT = 8;
+            double prev = 100;
+
+            while (prev < MAX_SIZE)
+            {
+                roundedPrev = (int)(2 * Math.Round(prev / 2));
+                resolutions.Add(roundedPrev);
+                prev *= 1 + (SRCSET_PERCENT_INCREMENT / 100) * 2;
+            }
+            resolutions.Add(MAX_SIZE);
+
+            return resolutions;
+        }
 
         private String HashString(String input)
         {
@@ -108,22 +176,6 @@ namespace Imgix
                         return String.Format("{0}={1}", encodedKey, encodedVal);
                     }
                 ));
-        }
-
-        private List<int> targetWidths() {
-            List<int> resolutions = new List<int>();
-            int MAX_SIZE = 8192, roundedPrev;
-            double SRCSET_INCREMENT_PERCENTAGE = 8;
-            double prev = 100;
-
-            while (prev <= MAX_SIZE)
-            {
-                resolutions.Add((int)(2 * Math.Round(prev / 2)));
-                prev *= 1 + (SRCSET_INCREMENT_PERCENTAGE / 100) * 2;
-            }
-            resolutions.Add(MAX_SIZE);
-
-            return resolutions;
         }
     }
 }
