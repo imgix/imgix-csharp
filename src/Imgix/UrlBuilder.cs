@@ -14,9 +14,9 @@ namespace Imgix
 
         private String _signKey;
         public String SignKey { set { _signKey = value; } }
-
         private String Domain;
-        //private const List<int> SRCSET_TARGET_WIDTHS = GenerateTargetWidths();
+
+        private static readonly List<int> SRCSET_TARGET_WIDTHS = GenerateTargetWidths();
 
         public UrlBuilder(String domain,
                           String signKey = null,
@@ -119,7 +119,6 @@ namespace Imgix
         private String GenerateSrcSetPairs(String domain, String path, Dictionary<String, String> parameters)
         {
             String srcset = "";
-            List<int> SRCSET_TARGET_WIDTHS = GenerateTargetWidths();
 
             foreach(int width in SRCSET_TARGET_WIDTHS)
             {
@@ -131,7 +130,7 @@ namespace Imgix
             return srcset.Substring(0, srcset.Length - 2);
         }
 
-        private List<int> GenerateTargetWidths()
+        private static List<int> GenerateTargetWidths()
         {
             List<int> resolutions = new List<int>();
             int MAX_SIZE = 8192, roundedPrev;
