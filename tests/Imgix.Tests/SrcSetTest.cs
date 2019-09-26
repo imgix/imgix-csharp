@@ -2,10 +2,12 @@
 using System;
 using System.Collections.Generic;
 using Imgix;
+using System.Security.Cryptography;
+using System.Linq;
 
 namespace Imgix.Tests
 {
-    [TestFixture][SetUpFixture]
+    [TestFixture]
     public class SrcSetTest
     {
         private static Dictionary<String, String> parameters;
@@ -18,46 +20,46 @@ namespace Imgix.Tests
         private static String[] srcsetHeightAndAspectRatioSplit;
 
         [TestFixtureSetUp]
-        public void BuildAllSrcSets()
+        public void Init()
         {
             String srcset, srcsetWidth, srcsetHeight, srcsetAspectRatio, srcsetWidthAndHeight, srcsetWidthAndAspectRatio, srcsetHeightAndAspectRatio;
 
-            UrlBuilder ub = new UrlBuilder("test.imgix.net", "MYT0KEN", true, true);
+            UrlBuilder ub = new UrlBuilder("test.imgix.net", "MYT0KEN", false, true);
             parameters = new Dictionary<String, String>();
 
             srcset = ub.BuildSrcSet("image.jpg");
             srcsetSplit = srcset.Split(',');
 
             parameters.Add("w", "300");
-            srcsetWidth = ub.BuildSrcSet("image.jpg");
+            srcsetWidth = ub.BuildSrcSet("image.jpg", parameters);
             srcsetWidthSplit = srcsetWidth.Split(',');
             parameters.Clear();
 
             parameters.Add("h", "300");
-            srcsetHeight = ub.BuildSrcSet("image.jpg");
+            srcsetHeight = ub.BuildSrcSet("image.jpg", parameters);
             srcsetHeightSplit = srcsetHeight.Split(',');
             parameters.Clear();
 
             parameters.Add("ar", "3:2");
-            srcsetAspectRatio = ub.BuildSrcSet("image.jpg");
+            srcsetAspectRatio = ub.BuildSrcSet("image.jpg", parameters);
             srcsetAspectRatioSplit = srcsetAspectRatio.Split(',');
             parameters.Clear();
 
             parameters.Add("w", "300");
             parameters.Add("h", "400");
-            srcsetWidthAndHeight = ub.BuildSrcSet("image.jpg");
+            srcsetWidthAndHeight = ub.BuildSrcSet("image.jpg", parameters);
             srcsetWidthAndHeightSplit = srcsetWidthAndHeight.Split(',');
             parameters.Clear();
 
             parameters.Add("w", "300");
             parameters.Add("ar", "3:2");
-            srcsetWidthAndAspectRatio = ub.BuildSrcSet("image.jpg");
+            srcsetWidthAndAspectRatio = ub.BuildSrcSet("image.jpg", parameters);
             srcsetWidthAndAspectRatioSplit = srcsetWidthAndAspectRatio.Split(',');
             parameters.Clear();
 
             parameters.Add("h", "300");
             parameters.Add("ar", "3:2");
-            srcsetHeightAndAspectRatio = ub.BuildSrcSet("image.jpg");
+            srcsetHeightAndAspectRatio = ub.BuildSrcSet("image.jpg", parameters);
             srcsetHeightAndAspectRatioSplit = srcsetHeightAndAspectRatio.Split(',');
             parameters.Clear();
         }
@@ -128,8 +130,7 @@ namespace Imgix.Tests
         [Test]
         public void NoParametersSignsUrls()
         {
-            String src, parameters, generatedSignature, signatureBase;
-            var expectedSignature = new uint();
+            String src, parameters, generatedSignature, signatureBase, expectedSignature;
 
             foreach (String srcLine in srcsetSplit)
             {
@@ -138,12 +139,14 @@ namespace Imgix.Tests
                 Assert.True(src.Contains("s="));
                 generatedSignature = src.Substring(src.IndexOf("s=") + 2);
 
-                parameters = src.Substring(src.IndexOf("?"), src.IndexOf("s=") - 1);
-                signatureBase = "MYT0KEN" + "/image.jpg" + parameters;
+                // calculate the number of chars between ? and s=
+                var parameterAll = src.Substring(src.IndexOf("?")).Length;
+                var parameterSignKey = src.Substring(src.IndexOf("s=")).Length;
 
-                // create MD5 hash
-                var crc = new Crc32();
-                expectedSignature = crc.ComputeCrcHash(signatureBase);
+                parameters = src.Substring(src.IndexOf("?"), parameterAll - parameterSignKey - 1);
+                signatureBase = "MYT0KEN" + "/image.jpg" + parameters;
+                var hashString = String.Format("{0}/{1}{2}", "MYT0KEN", "image.jpg", parameters);
+                expectedSignature = BitConverter.ToString(MD5.Create().ComputeHash(signatureBase.Select(Convert.ToByte).ToArray())).Replace("-", "").ToLower();
 
                 Assert.AreEqual(expectedSignature, generatedSignature);
             }
@@ -167,8 +170,7 @@ namespace Imgix.Tests
         [Test]
         public void WidthSignsUrls()
         {
-            String src, parameters, generatedSignature, signatureBase;
-            var expectedSignature = new uint();
+            String src, parameters, generatedSignature, signatureBase, expectedSignature;
 
             foreach (String srcLine in srcsetWidthSplit)
             {
@@ -177,12 +179,14 @@ namespace Imgix.Tests
                 Assert.True(src.Contains("s="));
                 generatedSignature = src.Substring(src.IndexOf("s=") + 2);
 
-                parameters = src.Substring(src.IndexOf("?"), src.IndexOf("s=") - 1);
-                signatureBase = "MYT0KEN" + "/image.jpg" + parameters;
+                // calculate the number of chars between ? and s=
+                var parameterAll = src.Substring(src.IndexOf("?")).Length;
+                var parameterSignKey = src.Substring(src.IndexOf("s=")).Length;
 
-                // create MD5 hash
-                var crc = new Crc32();
-                expectedSignature = crc.ComputeCrcHash(signatureBase);
+                parameters = src.Substring(src.IndexOf("?"), parameterAll - parameterSignKey - 1);
+                signatureBase = "MYT0KEN" + "/image.jpg" + parameters;
+                var hashString = String.Format("{0}/{1}{2}", "MYT0KEN", "image.jpg", parameters);
+                expectedSignature = BitConverter.ToString(MD5.Create().ComputeHash(signatureBase.Select(Convert.ToByte).ToArray())).Replace("-", "").ToLower();
 
                 Assert.AreEqual(expectedSignature, generatedSignature);
             }
@@ -196,7 +200,7 @@ namespace Imgix.Tests
             for (int i = 0; i < srcsetWidthSplit.Length; i++)
             {
                 src = srcsetWidthSplit[i].Split(' ')[0];
-                Assert.True(src.Contains(String.Format("dpr=%s", i + 1)));
+                Assert.True(src.Contains(String.Format("dpr={0}", i + 1)));
             }
         }
 
@@ -278,8 +282,7 @@ namespace Imgix.Tests
         [Test]
         public void testHeightSignsUrls()
         {
-            String src, parameters, generatedSignature, signatureBase;
-            var expectedSignature = new uint();
+            String src, parameters, generatedSignature, signatureBase, expectedSignature;
 
             foreach (String srcLine in srcsetHeightSplit)
             {
@@ -288,12 +291,14 @@ namespace Imgix.Tests
                 Assert.True(src.Contains("s="));
                 generatedSignature = src.Substring(src.IndexOf("s=") + 2);
 
-                parameters = src.Substring(src.IndexOf("?"), src.IndexOf("s=") - 1);
-                signatureBase = "MYT0KEN" + "/image.jpg" + parameters;
+                // calculate the number of chars between ? and s=
+                var parameterAll = src.Substring(src.IndexOf("?")).Length;
+                var parameterSignKey = src.Substring(src.IndexOf("s=")).Length;
 
-                // create MD5 hash
-                var crc = new Crc32();
-                expectedSignature = crc.ComputeCrcHash(signatureBase);
+                parameters = src.Substring(src.IndexOf("?"), parameterAll - parameterSignKey - 1);
+                signatureBase = "MYT0KEN" + "/image.jpg" + parameters;
+                var hashString = String.Format("{0}/{1}{2}", "MYT0KEN", "image.jpg", parameters);
+                expectedSignature = BitConverter.ToString(MD5.Create().ComputeHash(signatureBase.Select(Convert.ToByte).ToArray())).Replace("-", "").ToLower();
 
                 Assert.AreEqual(expectedSignature, generatedSignature);
             }
@@ -317,8 +322,7 @@ namespace Imgix.Tests
         [Test]
         public void WidthAndHeightSignsUrls()
         {
-            String src, parameters, generatedSignature, signatureBase;
-            var expectedSignature = new uint();
+            String src, parameters, generatedSignature, signatureBase, expectedSignature;
 
             foreach (String srcLine in srcsetWidthAndHeightSplit)
             {
@@ -327,12 +331,14 @@ namespace Imgix.Tests
                 Assert.True(src.Contains("s="));
                 generatedSignature = src.Substring(src.IndexOf("s=") + 2);
 
-                parameters = src.Substring(src.IndexOf("?"), src.IndexOf("s=") - 1);
-                signatureBase = "MYT0KEN" + "/image.jpg" + parameters;
+                // calculate the number of chars between ? and s=
+                var parameterAll = src.Substring(src.IndexOf("?")).Length;
+                var parameterSignKey = src.Substring(src.IndexOf("s=")).Length;
 
-                // create MD5 hash
-                var crc = new Crc32();
-                expectedSignature = crc.ComputeCrcHash(signatureBase);
+                parameters = src.Substring(src.IndexOf("?"), parameterAll - parameterSignKey - 1);
+                signatureBase = "MYT0KEN" + "/image.jpg" + parameters;
+                var hashString = String.Format("{0}/{1}{2}", "MYT0KEN", "image.jpg", parameters);
+                expectedSignature = BitConverter.ToString(MD5.Create().ComputeHash(signatureBase.Select(Convert.ToByte).ToArray())).Replace("-", "").ToLower();
 
                 Assert.AreEqual(expectedSignature, generatedSignature);
             }
@@ -346,7 +352,7 @@ namespace Imgix.Tests
             for (int i = 0; i < srcsetWidthAndHeightSplit.Length; i++)
             {
                 src = srcsetWidthAndHeightSplit[i].Split(' ')[0];
-                Assert.True(src.Contains(String.Format("dpr=%s", i + 1)));
+                Assert.True(src.Contains(String.Format("dpr={0}", i + 1)));
             }
         }
 
@@ -379,7 +385,7 @@ namespace Imgix.Tests
             foreach (String src in srcsetAspectRatioSplit)
             {
                 url = src.Split(' ')[0];
-                Assert.True(url.Contains("h="));
+                Assert.True(url.Contains("ar="));
             }
         }
 
@@ -428,8 +434,7 @@ namespace Imgix.Tests
         [Test]
         public void AspectRatioSignsUrls()
         {
-            String src, parameters, generatedSignature, signatureBase;
-            var expectedSignature = new uint();
+            String src, parameters, generatedSignature, signatureBase, expectedSignature;
 
             foreach (String srcLine in srcsetAspectRatioSplit)
             {
@@ -438,12 +443,14 @@ namespace Imgix.Tests
                 Assert.True(src.Contains("s="));
                 generatedSignature = src.Substring(src.IndexOf("s=") + 2);
 
-                parameters = src.Substring(src.IndexOf("?"), src.IndexOf("s=") - 1);
-                signatureBase = "MYT0KEN" + "/image.jpg" + parameters;
+                // calculate the number of chars between ? and s=
+                var parameterAll = src.Substring(src.IndexOf("?")).Length;
+                var parameterSignKey = src.Substring(src.IndexOf("s=")).Length;
 
-                // create MD5 hash
-                var crc = new Crc32();
-                expectedSignature = crc.ComputeCrcHash(signatureBase);
+                parameters = src.Substring(src.IndexOf("?"), parameterAll - parameterSignKey - 1);
+                signatureBase = "MYT0KEN" + "/image.jpg" + parameters;
+                var hashString = String.Format("{0}/{1}{2}", "MYT0KEN", "image.jpg", parameters);
+                expectedSignature = BitConverter.ToString(MD5.Create().ComputeHash(signatureBase.Select(Convert.ToByte).ToArray())).Replace("-", "").ToLower();
 
                 Assert.AreEqual(expectedSignature, generatedSignature);
             }
@@ -467,8 +474,7 @@ namespace Imgix.Tests
         [Test]
         public void WidthAndAspectRatioSignsUrls()
         {
-            String src, parameters, generatedSignature, signatureBase;
-            var expectedSignature = new uint();
+            String src, parameters, generatedSignature, signatureBase, expectedSignature;
 
             foreach (String srcLine in srcsetWidthAndAspectRatioSplit)
             {
@@ -477,12 +483,14 @@ namespace Imgix.Tests
                 Assert.True(src.Contains("s="));
                 generatedSignature = src.Substring(src.IndexOf("s=") + 2);
 
-                parameters = src.Substring(src.IndexOf("?"), src.IndexOf("s=") - 1);
-                signatureBase = "MYT0KEN" + "/image.jpg" + parameters;
+                // calculate the number of chars between ? and s=
+                var parameterAll = src.Substring(src.IndexOf("?")).Length;
+                var parameterSignKey = src.Substring(src.IndexOf("s=")).Length;
 
-                // create MD5 hash
-                var crc = new Crc32();
-                expectedSignature = crc.ComputeCrcHash(signatureBase);
+                parameters = src.Substring(src.IndexOf("?"), parameterAll - parameterSignKey - 1);
+                signatureBase = "MYT0KEN" + "/image.jpg" + parameters;
+                var hashString = String.Format("{0}/{1}{2}", "MYT0KEN", "image.jpg", parameters);
+                expectedSignature = BitConverter.ToString(MD5.Create().ComputeHash(signatureBase.Select(Convert.ToByte).ToArray())).Replace("-", "").ToLower();
 
                 Assert.AreEqual(expectedSignature, generatedSignature);
             }
@@ -496,7 +504,7 @@ namespace Imgix.Tests
             for (int i = 0; i < srcsetWidthAndAspectRatioSplit.Length; i++)
             {
                 src = srcsetWidthAndAspectRatioSplit[i].Split(' ')[0];
-                Assert.True(src.Contains(String.Format("dpr=%s", i + 1)));
+                Assert.True(src.Contains(String.Format("dpr={0}", i + 1)));
             }
         }
 
@@ -510,7 +518,7 @@ namespace Imgix.Tests
             foreach (String src in srcsetHeightAndAspectRatioSplit)
             {
                 generatedRatio = src.Split(' ')[1];
-                Assert.AreEqual(expectedRatio + "x", generatedRatio);
+                Assert.AreEqual(String.Format("{0}", expectedRatio + "x"), generatedRatio);
                 expectedRatio++;
             }
         }
@@ -518,8 +526,7 @@ namespace Imgix.Tests
         [Test]
         public void HeightAndAspectRatioSignsUrls()
         {
-            String src, parameters, generatedSignature, signatureBase;
-            var expectedSignature = new uint();
+            String src, parameters, generatedSignature, signatureBase, expectedSignature;
 
             foreach (String srcLine in srcsetHeightAndAspectRatioSplit)
             {
@@ -528,12 +535,14 @@ namespace Imgix.Tests
                 Assert.True(src.Contains("s="));
                 generatedSignature = src.Substring(src.IndexOf("s=") + 2);
 
-                parameters = src.Substring(src.IndexOf("?"), src.IndexOf("s=") - 1);
-                signatureBase = "MYT0KEN" + "/image.jpg" + parameters;
+                // calculate the number of chars between ? and s=
+                var parameterAll = src.Substring(src.IndexOf("?")).Length;
+                var parameterSignKey = src.Substring(src.IndexOf("s=")).Length;
 
-                // create MD5 hash
-                var crc = new Crc32();
-                expectedSignature = crc.ComputeCrcHash(signatureBase);
+                parameters = src.Substring(src.IndexOf("?"), parameterAll - parameterSignKey - 1);
+                signatureBase = "MYT0KEN" + "/image.jpg" + parameters;
+                var hashString = String.Format("{0}/{1}{2}", "MYT0KEN", "image.jpg", parameters);
+                expectedSignature = BitConverter.ToString(MD5.Create().ComputeHash(signatureBase.Select(Convert.ToByte).ToArray())).Replace("-", "").ToLower();
 
                 Assert.AreEqual(expectedSignature, generatedSignature);
             }
@@ -547,7 +556,7 @@ namespace Imgix.Tests
             for (int i = 0; i < srcsetHeightAndAspectRatioSplit.Length; i++)
             {
                 src = srcsetHeightAndAspectRatioSplit[i].Split(' ')[0];
-                Assert.True(src.Contains(String.Format("dpr=%s", i + 1)));
+                Assert.True(src.Contains(String.Format("dpr={0}", i + 1)));
             }
         }
     }
