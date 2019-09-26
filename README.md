@@ -75,7 +75,7 @@ The imgix-csharp library allows for generation of custom `srcset` attributes, wh
 
 ```csharp
 var builder = new UrlBuilder("domain.imgix.net", "my-token", false, true);
-String srcset = ub.BuildSrcSet("bridge.png");
+String srcset = builder.BuildSrcSet("bridge.png");
 Debug.Print(srcset);
 ```
 
@@ -85,7 +85,7 @@ Will produce the following attribute value, which can then be served to the clie
 https://domain.imgix.net/bridge.png?w=100&s=494158d968e94ac8e83772ada9a83ad1 100w,
 https://domain.imgix.net/bridge.png?w=116&s=6a22236e189b6a9548b531330647ffa7 116w,
 https://domain.imgix.net/bridge.png?w=134&s=cbf91f556dd67c0b9e26cb9784a83794 134w,
-                                    ...
+                                            ...
 https://domain.imgix.net/bridge.png?w=7400&s=503e3ba04588f1c301863c9a5d84fe91 7400w,
 https://domain.imgix.net/bridge.png?w=8192&s=152551ce4ec155f7a03f60f762a1ca33 8192w
 ```
@@ -98,18 +98,18 @@ var parameters = new Dictionary<String, String>();
 parameters["h"] = "200";
 parameters["ar"] = "3:2";
 parameters["fit"] = "crop";
-String srcset = ub.BuildSrcSet("bridge.png", parameters);
-Debug.Print(srcset);
+String srcset = builder.BuildSrcSet("bridge.png", parameters);
+Console.WriteLine(srcset);
 ```
 
 Will produce the following attribute value:
 
 ```html
-https://domain.imgix.net/bridge.png?ar=3%3A2&dpr=1&fit=crop&h=200&s=4c79373f535df7e2594a8f6622ec6631 1x,
-https://domain.imgix.net/bridge.png?ar=3%3A2&dpr=2&fit=crop&h=200&s=dc818ae4522494f2f750651304a4d825 2x,
-https://domain.imgix.net/bridge.png?ar=3%3A2&dpr=3&fit=crop&h=200&s=ba1ec0cef6c77ff02330d40cc4dae932 3x,
-https://domain.imgix.net/bridge.png?ar=3%3A2&dpr=4&fit=crop&h=200&s=b51e497d9461be62354c0ea12b6524fb 4x,
-https://domain.imgix.net/bridge.png?ar=3%3A2&dpr=5&fit=crop&h=200&s=dc37c1fbee505d425ca8e3764b37f791 5x
+https://domain.imgix.net/bridge.png?h=200&ar=3%3A2&fit=crop&dpr=1&s=f39a78a6a2f245a70ba6aac910088435 1x,
+https://domain.imgix.net/bridge.png?h=200&ar=3%3A2&fit=crop&dpr=2&s=d5dfd75bd777283d82975ab18a3091ff 2x,
+https://domain.imgix.net/bridge.png?h=200&ar=3%3A2&fit=crop&dpr=3&s=8f25811130e3573530754c52f86a851d 3x,
+https://domain.imgix.net/bridge.png?h=200&ar=3%3A2&fit=crop&dpr=4&s=ec348479a843a688c2ef9be487ea9be8 4x,
+https://domain.imgix.net/bridge.png?h=200&ar=3%3A2&fit=crop&dpr=5&s=ce70bbfd682e683497f1afa6118ae2e3 5x
 ```
 
 For more information to better understand `srcset`, we highly recommend [Eric Portis' "Srcset and sizes" article](https://ericportis.com/posts/2014/srcset-sizes/) which goes into depth about the subject.
