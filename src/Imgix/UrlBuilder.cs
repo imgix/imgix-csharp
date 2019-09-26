@@ -108,8 +108,9 @@ namespace Imgix
 
             foreach(int ratio in targetRatios)
             {
-                parameters.Add("dpr", ratio.ToString());
-                srcset += BuildUrl(path, parameters) + " " + "x,\n";
+                parameters["dpr"] = ratio.ToString();
+                parameters.Remove("ixlib");
+                srcset += BuildUrl(path, parameters) + " " + ratio.ToString()+ "x,\n";
             }
 
             return srcset.Substring(0, srcset.Length - 2);
@@ -122,7 +123,8 @@ namespace Imgix
 
             foreach(int width in SRCSET_TARGET_WIDTHS)
             {
-                parameters.Add("w", width.ToString());
+                parameters["w"] = width.ToString();
+                parameters.Remove("ixlib");
                 srcset += BuildUrl(path, parameters) + " " + width + "w,\n";
             }
 
