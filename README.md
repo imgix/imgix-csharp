@@ -1,8 +1,22 @@
-# Imgix-CSharp
+<!-- ix-docs-ignore -->
+![imgix logo](https://assets.imgix.net/sdk-imgix-logo.svg)
 
+`imgix-csharp` is a client library for generating image URLs with [imgix](https://www.imgix.com/). 
+
+[![Version](https://img.shields.io/nuget/v/imgix)](https://www.nuget.org/packages/Imgix/)
 [![Build Status](https://travis-ci.org/imgix/Imgix-CSharp.svg?branch=master)](https://travis-ci.org/imgix/Imgix-CSharp)
+![Downloads](https://img.shields.io/nuget/dt/imgix-csharp)
+[![License](https://img.shields.io/github/license/imgix/imgix-csharp)](https://github.com/imgix/imgix-csharp/blob/master/LICENSE)
 
-imgix URL builder library written in C#. [imgix](http://www.imgix.com/) is an image manipulation framework over HTTP with a variety of benefits.
+---
+<!-- /ix-docs-ignore -->
+
+- [Installation](#installation)
+- [Usage](#Usage)
+- [Signed URLs](#signed-urls)
+- [Srcset Generation](#srcset-generation)
+- [What is the ixlib param on every request?](#what-is-the-ixlib-param-on-every-request)
+- [Code of Conduct](#code-of-conduct)
 
 ## Installation
 The latest version of the library can be installed via NuGet:
@@ -18,7 +32,7 @@ v1.x of the library can be installed via NuGet:
     Install-Package Imgix-CSharp
 
 
-## Basic Usage
+## Usage
 
 You can start creating imgix URLs programmatically through `UrlBuilder` instances. The URL builder can be reused to create URLs for any images on the domains it is provided.
 
@@ -56,20 +70,7 @@ Debug.Print(builder.BuildUrl("gaiman.jpg", parameters));
 // https://domain.imgix.net/gaiman.jpg?w=500&h=1000&s=fc4afbc39b6741560717142aeada876c
 ```
 
-## What is the `ixlib` param on every request?
-
-For security and diagnostic purposes, we sign all requests with the language and version of library used to generate the URL.
-
-This can be disabled by passing `false` for the `includeLibraryParam` option to `new UrlBuilder`:
-
-```csharp
-using Imgix;
-...
-var builder = new UrlBuilder("domain.imgix.net", includeLibraryParam: false);
-```
-
-Srcset Generation
------------
+## Srcset Generation
 
 The imgix-csharp library allows for generation of custom `srcset` attributes, which can be invoked through `BuildSrcSet()`. By default, the `srcset` generated will allow for responsive size switching by building a list of image-width mappings.
 
@@ -113,6 +114,18 @@ https://domain.imgix.net/bridge.png?h=200&ar=3%3A2&fit=crop&dpr=5&s=ce70bbfd682e
 ```
 
 For more information to better understand `srcset`, we highly recommend [Eric Portis' "Srcset and sizes" article](https://ericportis.com/posts/2014/srcset-sizes/) which goes into depth about the subject.
+
+## What is the `ixlib` param on every request?
+
+For security and diagnostic purposes, we sign all requests with the language and version of library used to generate the URL.
+
+This can be disabled by passing `false` for the `includeLibraryParam` option to `new UrlBuilder`:
+
+```csharp
+using Imgix;
+...
+var builder = new UrlBuilder("domain.imgix.net", includeLibraryParam: false);
+```
 
 ## Code of Conduct
 Users contributing to or participating in the development of this project are subject to the terms of imgix's [Code of Conduct](https://github.com/imgix/code-of-conduct).
