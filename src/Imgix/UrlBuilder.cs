@@ -52,7 +52,8 @@ namespace Imgix
                 path = WebUtility.UrlEncode(path);
             }
 
-            if (IncludeLibraryParam)
+            Boolean hasLibParam = parameters.TryGetValue("ixlib", out String hasLib);
+            if (IncludeLibraryParam && !hasLibParam)
             {
                 parameters.Add("ixlib", String.Format("csharp-{0}", typeof(UrlBuilder).GetTypeInfo().Assembly.GetName().Version));
             }
@@ -109,7 +110,6 @@ namespace Imgix
             foreach(int ratio in targetRatios)
             {
                 parameters["dpr"] = ratio.ToString();
-                parameters.Remove("ixlib");
                 srcset += BuildUrl(path, parameters) + " " + ratio.ToString()+ "x,\n";
             }
 
@@ -123,7 +123,6 @@ namespace Imgix
             foreach(int width in SRCSET_TARGET_WIDTHS)
             {
                 parameters["w"] = width.ToString();
-                parameters.Remove("ixlib");
                 srcset += BuildUrl(path, parameters) + " " + width + "w,\n";
             }
 
