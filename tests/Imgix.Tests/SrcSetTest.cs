@@ -600,5 +600,49 @@ namespace Imgix.Tests
             Assert.AreEqual(expected, actual);
 
         }
+
+        [Test]
+        public void TestCustomSrcSetPairs()
+        {
+            UrlBuilder ub = new UrlBuilder(
+                "test.imgix.net",
+                signKey: null,
+                includeLibraryParam: false,
+                useHttps: true);
+
+            String srcset = ub.BuildSrcSet(
+                "image.jpg",
+                new Dictionary<string, string>(),
+                start: 328, stop: 328);
+
+            Assert.AreEqual("https://test.imgix.net/image.jpg?w=328 328w", srcset);
+
+            String srcset640to720 = ub.BuildSrcSet(
+                "image.jpg",
+                new Dictionary<string, string>(),
+                start: 640, stop: 720);
+
+            String expect640to720 =
+                "https://test.imgix.net/image.jpg?w=640 640w," +
+                "\nhttps://test.imgix.net/image.jpg?w=720 720w";
+
+            Assert.AreEqual(expect640to720, srcset640to720);
+
+            String expect100to108 =
+                "https://test.imgix.net/image.jpg?w=100 100w," +
+                "\nhttps://test.imgix.net/image.jpg?w=102 102w," +
+                "\nhttps://test.imgix.net/image.jpg?w=104 104w," +
+                "\nhttps://test.imgix.net/image.jpg?w=106 106w," +
+                "\nhttps://test.imgix.net/image.jpg?w=108 108w";
+
+            String srcset100to108 = ub.BuildSrcSet(
+                "image.jpg",
+                new Dictionary<string, string>(),
+                start: 100,
+                stop: 108,
+                tol: 1);
+
+            Assert.AreEqual(expect100to108, srcset100to108);
+        }
     }
 }
