@@ -66,7 +66,13 @@ namespace Imgix
             return BuildSrcSet(path, new Dictionary<string, string>());
         }
 
-        public String BuildSrcSet(String path, Dictionary<String, String> parameters)
+
+        public String BuildSrcSet(
+            String path,
+            Dictionary<String, String> parameters,
+            int start = 100,
+            int stop = 8192,
+            int tol = 8)
         {
             String srcset;
             parameters.TryGetValue("w", out String width);
@@ -79,7 +85,8 @@ namespace Imgix
             }
             else
             {
-                srcset = GenerateSrcSetPairs(Domain, path, parameters);
+                List<int> targets = GenerateTargetWidths(start: start, stop: stop, tol: tol);
+                srcset = GenerateSrcSetPairs(Domain, path, parameters, targets: targets);
             }
 
             return srcset;
@@ -116,11 +123,20 @@ namespace Imgix
             return srcset.Substring(0, srcset.Length - 2);
         }
 
-        private String GenerateSrcSetPairs(String domain, String path, Dictionary<String, String> parameters)
+        private String GenerateSrcSetPairs(
+            String domain,
+            String path,
+            Dictionary<String, String> parameters,
+            List<int> targets = null)
         {
+            if (targets == null)
+            {
+                targets = GenerateTargetWidths();
+            }
+
             String srcset = "";
 
-            foreach(int width in SRCSET_TARGET_WIDTHS)
+            foreach(int width in targets)
             {
                 parameters["w"] = width.ToString();
                 srcset += BuildUrl(path, parameters) + " " + width + "w,\n";
@@ -135,6 +151,11 @@ namespace Imgix
         {
             List<int> resolutions = new List<int>();
             int MAX_SIZE = 8192;
+
+            if (start == stop)
+            {
+                return new List<int> {MakeEven(start)};
+            }
 
             while (start < stop && start < MAX_SIZE)
             {
