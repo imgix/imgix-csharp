@@ -129,22 +129,30 @@ namespace Imgix
             return srcset.Substring(0, srcset.Length - 2);
         }
 
-        private static List<int> GenerateTargetWidths()
+        public static List<int>
+            GenerateTargetWidths(
+                double start = 100, double stop = 8192, double tol = 8)
         {
             List<int> resolutions = new List<int>();
-            int MAX_SIZE = 8192, roundedPrev;
-            double SRCSET_PERCENT_INCREMENT = 8;
-            double prev = 100;
+            int MAX_SIZE = 8192;
 
-            while (prev < MAX_SIZE)
+            while (start < stop && start < MAX_SIZE)
             {
-                roundedPrev = (int)(2 * Math.Round(prev / 2));
-                resolutions.Add(roundedPrev);
-                prev *= 1 + (SRCSET_PERCENT_INCREMENT / 100) * 2;
+                resolutions.Add(MakeEven(start));
+                start *= 1 + (tol / 100) * 2;
             }
-            resolutions.Add(MAX_SIZE);
+
+            if (resolutions.Last() < stop)
+            {
+                resolutions.Add(MakeEven(stop));
+            }
 
             return resolutions;
+        }
+
+        private static int MakeEven(double value)
+        {
+            return (int)(2 * Math.Round(value / 2));
         }
 
         private String HashString(String input)

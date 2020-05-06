@@ -559,5 +559,46 @@ namespace Imgix.Tests
                 Assert.True(src.Contains(String.Format("dpr={0}", i + 1)));
             }
         }
+
+        [Test]
+        public void TargetWidths100to7400()
+        {
+            List<int> actual = UrlBuilder.GenerateTargetWidths(start: 100, stop: 7400);
+            int[] expected = {
+                100, 116, 134, 156, 182, 210, 244, 282,
+                328, 380, 442, 512, 594, 688, 798, 926,
+                1074, 1246, 1446, 1678, 1946, 2258, 2618,
+                3038, 3524, 4088, 4742, 5500, 6380, 7400 };
+
+            Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
+        public void TargetWidths328to4088()
+        {
+            List<int> actual = UrlBuilder.GenerateTargetWidths(start: 328, stop: 4088);
+            int[] expected = {
+                328, 380, 442, 512, 594, 688,
+                /* 798 */ 800,
+                /* 926 */ 928,
+                /* 1074 */ 1076, 1248, 1446, 1678,
+                1948, 2258,
+                /* 2620 */ 2620,
+                /* 3038 */ 3040,
+                /* 3524 */ 3526, 4088};
+
+            Assert.AreEqual(expected, actual);
+
+        }
+
+        [Test]
+        public void TargetWidths100to8192MaxTolerance()
+        {
+            List<int> actual = UrlBuilder.GenerateTargetWidths(tol: 100000000);
+            int[] expected = { 100, 8192 };
+
+            Assert.AreEqual(expected, actual);
+
+        }
     }
 }
