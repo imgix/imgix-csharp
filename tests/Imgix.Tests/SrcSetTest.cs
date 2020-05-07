@@ -577,6 +577,9 @@ namespace Imgix.Tests
         public void TargetWidths328to4088()
         {
             List<int> actual = UrlBuilder.GenerateTargetWidths(start: 328, stop: 4088);
+            // `GenerateTargetWidths` depends on the start value; consequently,
+            // values between `start` and `stop` may be a couple pixels above
+            // (and perhaps below) our defaults (if tolerance is default).
             int[] expected = {
                 328, 380, 442, 512, 594, 688,
                 /* 798 */ 800,
@@ -643,6 +646,54 @@ namespace Imgix.Tests
                 tol: 1);
 
             Assert.AreEqual(expect100to108, srcset100to108);
+        }
+
+        [Test]
+        public void TestDprSrcSetWithDefaultQuality()
+        {
+            UrlBuilder ub = new UrlBuilder(
+                "test.imgix.net",
+                signKey: null,
+                includeLibraryParam: false,
+                useHttps: true);
+
+            var parameters = new Dictionary<string, string>() { { "w", "100" } };
+            String srcset = ub.BuildSrcSet("image.jpg", parameters);
+
+            String expected =
+            "https://test.imgix.net/image.jpg?w=100&q=75&dpr=1 1x," +
+            "\nhttps://test.imgix.net/image.jpg?w=100&q=50&dpr=2 2x," +
+            "\nhttps://test.imgix.net/image.jpg?w=100&q=35&dpr=3 3x," +
+            "\nhttps://test.imgix.net/image.jpg?w=100&q=23&dpr=4 4x," +
+            "\nhttps://test.imgix.net/image.jpg?w=100&q=20&dpr=5 5x";
+
+            Assert.AreEqual(expected, srcset);
+        }
+
+        [Test]
+        public void TestDprSrcSetWithVariableQualityDisabled()
+        {
+            UrlBuilder ub = new UrlBuilder(
+                "test.imgix.net",
+                signKey: null,
+                includeLibraryParam: false,
+                useHttps: true);
+
+            var parameters = new Dictionary<string, string>() { { "w", "100" } };
+
+            String srcset = ub.BuildSrcSet(
+                "image.jpg",
+                parameters,
+                disableVariableQuality: true);
+
+            String expected =
+            "https://test.imgix.net/image.jpg?w=100&dpr=1 1x," +
+            "\nhttps://test.imgix.net/image.jpg?w=100&dpr=2 2x," +
+            "\nhttps://test.imgix.net/image.jpg?w=100&dpr=3 3x," +
+            "\nhttps://test.imgix.net/image.jpg?w=100&dpr=4 4x," +
+            "\nhttps://test.imgix.net/image.jpg?w=100&dpr=5 5x";
+
+            Assert.AreEqual(expected, srcset);
         }
     }
 }

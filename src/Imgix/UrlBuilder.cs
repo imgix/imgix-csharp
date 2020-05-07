@@ -18,6 +18,12 @@ namespace Imgix
 
         private static readonly List<int> SRCSET_TARGET_WIDTHS = GenerateTargetWidths();
 
+        private static readonly Dictionary<int, int> DPR_QUALITIES = 
+            new Dictionary<int, int>() { 
+                { 1, 75 }, { 2, 50 }, 
+                { 3, 35 }, { 4, 23 }, 
+                { 5, 20 } };
+
         public UrlBuilder(String domain,
                           String signKey = null,
                           Boolean includeLibraryParam = true,
@@ -72,7 +78,8 @@ namespace Imgix
             Dictionary<String, String> parameters,
             int start = 100,
             int stop = 8192,
-            int tol = 8)
+            int tol = 8,
+            Boolean disableVariableQuality = false)
         {
             String srcset;
             parameters.TryGetValue("w", out String width);
@@ -81,7 +88,7 @@ namespace Imgix
 
             if ((width != null) || (height != null && aspectRatio != null))
             {
-                srcset = GenerateSrcSetDPR(Domain, path, parameters);
+                srcset = GenerateSrcSetDPR(Domain, path, parameters, disableVariableQuality);
             }
             else
             {
@@ -109,13 +116,23 @@ namespace Imgix
             return String.Format("{0}://{1}/{2}{3}", scheme, domain, path, localParams.Any() ? "?" + GenerateUrlStringFromDict(localParams) : String.Empty);
         }
 
-        private String GenerateSrcSetDPR(String domain, String path, Dictionary<String, String> parameters)
+        private String
+            GenerateSrcSetDPR(
+            String domain,
+            String path,
+            Dictionary<String, String> parameters,
+            Boolean disableVariableQuality)
         {
             String srcset = "";
             int[] targetRatios = { 1, 2, 3, 4, 5 };
 
+            Boolean hasQuality = parameters.TryGetValue("q", out String q);
             foreach(int ratio in targetRatios)
             {
+                if (!disableVariableQuality && !hasQuality)
+                {
+                    parameters["q"] = DPR_QUALITIES[ratio].ToString();
+                }
                 parameters["dpr"] = ratio.ToString();
                 srcset += BuildUrl(path, parameters) + " " + ratio.ToString()+ "x,\n";
             }
