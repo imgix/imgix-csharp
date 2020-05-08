@@ -166,7 +166,6 @@ namespace Imgix
             GenerateTargetWidths(
                 double start = 100, double stop = 8192, double tol = 8)
         {
-            List<int> resolutions = new List<int>();
             int MAX_SIZE = 8192;
 
             if (start == stop)
@@ -174,6 +173,7 @@ namespace Imgix
                 return new List<int> {MakeEven(start)};
             }
 
+            List<int> resolutions = new List<int>();
             while (start < stop && start < MAX_SIZE)
             {
                 resolutions.Add(MakeEven(start));
