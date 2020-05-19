@@ -644,6 +644,32 @@ namespace Imgix.Tests
         }
 
         [Test]
+        public void TestSrcSetPairsWithCustomTargets()
+        {
+            UrlBuilder ub = new UrlBuilder(
+               "test.imgix.net",
+               signKey: null,
+               includeLibraryParam: false,
+               useHttps: true);
+
+            String expect100to513 =
+                "https://test.imgix.net/image.jpg?w=100 100w,\n" +
+                "https://test.imgix.net/image.jpg?w=200 200w,\n" +
+                "https://test.imgix.net/image.jpg?w=300 300w,\n" +
+                "https://test.imgix.net/image.jpg?w=400 400w,\n" +
+                "https://test.imgix.net/image.jpg?w=513 513w";
+
+            int[] targetWidths = {100, 200, 300, 400, 513};
+
+            String srcset100to513 = ub.BuildSrcSet(
+                "image.jpg",
+                new Dictionary<string, string>(),
+                targetWidths.ToList());
+
+            Assert.AreEqual(expect100to513, srcset100to513);
+        }
+
+        [Test]
         public void TestDisableVariableQualityOffByDefault()
         {
             UrlBuilder ub = new UrlBuilder(

@@ -185,6 +185,18 @@ namespace Imgix
         }
 
         /// <summary>
+        /// Create a srcset attribute by specifying a list of target widths.
+        /// </summary>
+        /// <param name="path">path to the image, i.e. "image/file.png"</param>
+        /// <param name="parameters">dictionary of query parameters</param>
+        /// <param name="targets">list of target widths</param>
+        /// <returns>srcset attribute string</returns>
+        public String BuildSrcSet(String path, Dictionary<String, String> parameters, List<int> targets)
+        {
+            return GenerateSrcSetPairs(path, parameters, targets: targets);
+        }
+
+        /// <summary>
         /// Create a srcset attribute.
         ///
         /// If the `parameters` indicate the srcset attribute should be
@@ -201,7 +213,7 @@ namespace Imgix
         /// <param name="tol">tolerable amount of width value variation, 1-100.</param>
         /// <param name="disableVariableQuality">toggle variable quality output on
         /// (default/false) or off (true).</param>
-        /// <returns></returns>
+        /// <returns>srcset attribute string</returns>
         public String BuildSrcSet(
             String path,
             Dictionary<String, String> parameters,
