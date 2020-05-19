@@ -67,10 +67,11 @@ namespace Imgix.Tests
         [Test]
         public void NoParametersGeneratesCorrectWidths()
         {
-            int[] targetWidths = {100, 116, 134, 156, 182, 210, 244, 282,
-                328, 380, 442, 512, 594, 688, 798, 926,
-                1074, 1246, 1446, 1678, 1946, 2258, 2618,
-                3038, 3524, 4088, 4742, 5500, 6380, 7400, 8192};
+            int[] targetWidths = {
+                100, 116, 135, 156, 181, 210, 244, 283,
+                328, 380, 441, 512, 594, 689, 799, 927,
+                1075, 1247, 1446, 1678, 1946, 2257, 2619,
+                3038, 3524, 4087, 4741, 5500, 6380, 7401, 8192};
 
             String generatedWidth;
             int index = 0;
@@ -207,10 +208,11 @@ namespace Imgix.Tests
         [Test]
         public void HeightGeneratesCorrectWidths()
         {
-            int[] targetWidths = {100, 116, 134, 156, 182, 210, 244, 282,
-                328, 380, 442, 512, 594, 688, 798, 926,
-                1074, 1246, 1446, 1678, 1946, 2258, 2618,
-                3038, 3524, 4088, 4742, 5500, 6380, 7400, 8192};
+            int[] targetWidths = {
+                100, 116, 135, 156, 181, 210, 244, 283,
+                328, 380, 441, 512, 594, 689, 799, 927,
+                1075, 1247, 1446, 1678, 1946, 2257, 2619,
+                3038, 3524, 4087, 4741, 5500, 6380, 7401, 8192};
 
             String generatedWidth;
             int index = 0;
@@ -359,10 +361,11 @@ namespace Imgix.Tests
         [Test]
         public void AspectRatioGeneratesCorrectWidths()
         {
-            int[] targetWidths = {100, 116, 134, 156, 182, 210, 244, 282,
-                328, 380, 442, 512, 594, 688, 798, 926,
-                1074, 1246, 1446, 1678, 1946, 2258, 2618,
-                3038, 3524, 4088, 4742, 5500, 6380, 7400, 8192};
+            int[] targetWidths = {
+                100, 116, 135, 156, 181, 210, 244, 283,
+                328, 380, 441, 512, 594, 689, 799, 927,
+                1075, 1247, 1446, 1678, 1946, 2257, 2619,
+                3038, 3524, 4087, 4741, 5500, 6380, 7401, 8192};
 
             String generatedWidth;
             int index = 0;
@@ -563,32 +566,23 @@ namespace Imgix.Tests
         [Test]
         public void TargetWidths100to7400()
         {
-            List<int> actual = UrlBuilder.GenerateTargetWidths(start: 100, stop: 7400);
+            List<int> actual = UrlBuilder.GenerateTargetWidths(begin: 100, end: 7401);
             int[] expected = {
-                100, 116, 134, 156, 182, 210, 244, 282,
-                328, 380, 442, 512, 594, 688, 798, 926,
-                1074, 1246, 1446, 1678, 1946, 2258, 2618,
-                3038, 3524, 4088, 4742, 5500, 6380, 7400 };
-
+                100, 116, 135, 156, 181, 210, 244, 283,
+                328, 380, 441, 512, 594, 689, 799, 927,
+                1075, 1247, 1446, 1678, 1946, 2257, 2619,
+                3038, 3524, 4087, 4741, 5500, 6380, 7401};
             Assert.AreEqual(expected, actual);
         }
 
         [Test]
         public void TargetWidths328to4088()
         {
-            List<int> actual = UrlBuilder.GenerateTargetWidths(start: 328, stop: 4088);
-            // `GenerateTargetWidths` depends on the start value; consequently,
-            // values between `start` and `stop` may be a couple pixels above
-            // (and perhaps below) our defaults (if tolerance is default).
+            List<int> actual = UrlBuilder.GenerateTargetWidths(begin: 328, end: 4088);
             int[] expected = {
-                328, 380, 442, 512, 594, 688,
-                /* 798 */ 800,
-                /* 926 */ 928,
-                /* 1074 */ 1076, 1248, 1446, 1678,
-                1948, 2258,
-                /* 2620 */ 2620,
-                /* 3038 */ 3040,
-                /* 3524 */ 3526, 4088};
+                328, 380, 441, 512, 594, 689, 799, 927,
+                1075, 1247, 1447, 1678, 1947, 2259, 2620,
+                3039, 3525, 4088};
 
             Assert.AreEqual(expected, actual);
 
@@ -613,43 +607,44 @@ namespace Imgix.Tests
                 includeLibraryParam: false,
                 useHttps: true);
 
+            // Begin == End
             String srcset = ub.BuildSrcSet(
                 "image.jpg",
                 new Dictionary<string, string>(),
-                start: 328, stop: 328);
+                begin: 328, end: 328);
 
             Assert.AreEqual("https://test.imgix.net/image.jpg?w=328 328w", srcset);
 
             String srcset640to720 = ub.BuildSrcSet(
                 "image.jpg",
                 new Dictionary<string, string>(),
-                start: 640, stop: 720);
+                begin: 640, end: 720);
 
             String expect640to720 =
-                "https://test.imgix.net/image.jpg?w=640 640w," +
-                "\nhttps://test.imgix.net/image.jpg?w=720 720w";
+                "https://test.imgix.net/image.jpg?w=640 640w,\n" +
+                "https://test.imgix.net/image.jpg?w=720 720w";
 
             Assert.AreEqual(expect640to720, srcset640to720);
 
             String expect100to108 =
-                "https://test.imgix.net/image.jpg?w=100 100w," +
-                "\nhttps://test.imgix.net/image.jpg?w=102 102w," +
-                "\nhttps://test.imgix.net/image.jpg?w=104 104w," +
-                "\nhttps://test.imgix.net/image.jpg?w=106 106w," +
-                "\nhttps://test.imgix.net/image.jpg?w=108 108w";
+                "https://test.imgix.net/image.jpg?w=100 100w,\n" +
+                "https://test.imgix.net/image.jpg?w=102 102w,\n" +
+                "https://test.imgix.net/image.jpg?w=104 104w,\n" +
+                "https://test.imgix.net/image.jpg?w=106 106w,\n" +
+                "https://test.imgix.net/image.jpg?w=108 108w";
 
             String srcset100to108 = ub.BuildSrcSet(
                 "image.jpg",
                 new Dictionary<string, string>(),
-                start: 100,
-                stop: 108,
+                begin: 100,
+                end: 108,
                 tol: 1);
 
             Assert.AreEqual(expect100to108, srcset100to108);
         }
 
         [Test]
-        public void TestDprSrcSetWithDefaultQuality()
+        public void TestDisableVariableQualityOffByDefault()
         {
             UrlBuilder ub = new UrlBuilder(
                 "test.imgix.net",
@@ -661,17 +656,17 @@ namespace Imgix.Tests
             String srcset = ub.BuildSrcSet("image.jpg", parameters);
 
             String expected =
-            "https://test.imgix.net/image.jpg?w=100&q=75&dpr=1 1x," +
-            "\nhttps://test.imgix.net/image.jpg?w=100&q=50&dpr=2 2x," +
-            "\nhttps://test.imgix.net/image.jpg?w=100&q=35&dpr=3 3x," +
-            "\nhttps://test.imgix.net/image.jpg?w=100&q=23&dpr=4 4x," +
-            "\nhttps://test.imgix.net/image.jpg?w=100&q=20&dpr=5 5x";
+            "https://test.imgix.net/image.jpg?w=100&q=75&dpr=1 1x,\n" +
+            "https://test.imgix.net/image.jpg?w=100&q=50&dpr=2 2x,\n" +
+            "https://test.imgix.net/image.jpg?w=100&q=35&dpr=3 3x,\n" +
+            "https://test.imgix.net/image.jpg?w=100&q=23&dpr=4 4x,\n" +
+            "https://test.imgix.net/image.jpg?w=100&q=20&dpr=5 5x";
 
             Assert.AreEqual(expected, srcset);
         }
 
         [Test]
-        public void TestDprSrcSetWithVariableQualityDisabled()
+        public void TestDisableVariableQuality()
         {
             UrlBuilder ub = new UrlBuilder(
                 "test.imgix.net",
@@ -684,14 +679,67 @@ namespace Imgix.Tests
             String srcset = ub.BuildSrcSet(
                 "image.jpg",
                 parameters,
-                disableVariableQuality: true);
+                disableVariableQuality: true); // disable variable quality
 
             String expected =
-            "https://test.imgix.net/image.jpg?w=100&dpr=1 1x," +
-            "\nhttps://test.imgix.net/image.jpg?w=100&dpr=2 2x," +
-            "\nhttps://test.imgix.net/image.jpg?w=100&dpr=3 3x," +
-            "\nhttps://test.imgix.net/image.jpg?w=100&dpr=4 4x," +
-            "\nhttps://test.imgix.net/image.jpg?w=100&dpr=5 5x";
+            "https://test.imgix.net/image.jpg?w=100&dpr=1 1x,\n" +
+            "https://test.imgix.net/image.jpg?w=100&dpr=2 2x,\n" +
+            "https://test.imgix.net/image.jpg?w=100&dpr=3 3x,\n" +
+            "https://test.imgix.net/image.jpg?w=100&dpr=4 4x,\n" +
+            "https://test.imgix.net/image.jpg?w=100&dpr=5 5x";
+
+            Assert.AreEqual(expected, srcset);
+        }
+
+        [Test]
+        public void TestDisableVariableQualityWithQuality()
+        {
+            UrlBuilder ub = new UrlBuilder(
+                "test.imgix.net",
+                signKey: null,
+                includeLibraryParam: false,
+                useHttps: false);
+
+            var parameters = new Dictionary<string, string>() { { "w", "100" }, { "q", "99" } };
+
+            String srcset = ub.BuildSrcSet(
+                "image.png",
+                parameters,
+                disableVariableQuality: true); // disable variable quality
+
+            String expected =
+                "http://test.imgix.net/image.png?w=100&q=99&dpr=1 1x,\n" +
+                "http://test.imgix.net/image.png?w=100&q=99&dpr=2 2x,\n" +
+                "http://test.imgix.net/image.png?w=100&q=99&dpr=3 3x,\n" +
+                "http://test.imgix.net/image.png?w=100&q=99&dpr=4 4x,\n" +
+                "http://test.imgix.net/image.png?w=100&q=99&dpr=5 5x";
+
+            Assert.AreEqual(expected, srcset);
+        }
+
+        [Test]
+        public void TestVariableQualityEnabledWithQ()
+        {
+            UrlBuilder ub = new UrlBuilder(
+                "test.imgix.net",
+                signKey: null,
+                includeLibraryParam: false,
+                useHttps: true);
+
+            // Pass "q" with variable quality enabled.
+            var parameters = new Dictionary<string, string>() { { "ar", "2:3"}, { "h", "100" }, { "q", "99" } };
+
+            String srcset = ub.BuildSrcSet(
+                "image.png",
+                parameters,
+                disableVariableQuality: false); // Variable quality enabled.
+
+            String expected =
+                "https://test.imgix.net/image.png?ar=2%3A3&h=100&q=99&dpr=1 1x,\n" +
+                "https://test.imgix.net/image.png?ar=2%3A3&h=100&q=99&dpr=2 2x,\n" +
+                "https://test.imgix.net/image.png?ar=2%3A3&h=100&q=99&dpr=3 3x,\n" +
+                "https://test.imgix.net/image.png?ar=2%3A3&h=100&q=99&dpr=4 4x,\n" +
+                "https://test.imgix.net/image.png?ar=2%3A3&h=100&q=99&dpr=5 5x";
 
             Assert.AreEqual(expected, srcset);
         }
