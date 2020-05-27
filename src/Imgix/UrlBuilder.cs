@@ -112,7 +112,7 @@ namespace Imgix
         /// <param name="parameters">dictionary of query parameters</param>
         /// <param name="disableVariableQuality">toggle variable quality output on
         /// (default/false) or off (true).</param>
-        /// <returns></returns>
+        /// <returns>srcset attribute string</returns>
         public String BuildSrcSet(
             String path,
             Dictionary<String, String> parameters,
@@ -144,7 +144,7 @@ namespace Imgix
         }
 
         /// <summary>
-        /// Create a a srcset attribute by specifying `begin` and `end`.
+        /// Create a srcset attribute by specifying `begin` and `end`.
         ///
         /// This method creates a srcset attribute string whose image width
         /// values range between `begin` and `end`.
@@ -163,7 +163,7 @@ namespace Imgix
         }
 
         /// <summary>
-        /// Create a a srcset attribute by specifying `begin`, `end`, and `tol`.
+        /// Create a srcset attribute by specifying `begin`, `end`, and `tol`.
         ///
         /// This method creates a srcset attribute string whose image width
         /// values range between `begin` and `end` with the specified amount
