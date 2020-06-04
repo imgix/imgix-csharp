@@ -28,7 +28,7 @@ namespace Imgix
 
         const int MaxWidth = 8192;
         const int MinWidth = 100;
-        const int SrcSetWidthTolerance = 8;
+        const double SrcSetWidthTolerance = 0.08;
 
         public UrlBuilder(String domain,
                           String signKey = null,
@@ -138,7 +138,7 @@ namespace Imgix
         public String BuildSrcSet(
             String path,
             Dictionary<String, String> parameters,
-            int tol = SrcSetWidthTolerance)
+            double tol = SrcSetWidthTolerance)
         {
             return BuildSrcSet(path, parameters, MinWidth, MaxWidth, tol);
         }
@@ -179,7 +179,7 @@ namespace Imgix
             Dictionary<String, String> parameters,
             int begin = MinWidth,
             int end = MaxWidth,
-            int tol = SrcSetWidthTolerance)
+            double tol = SrcSetWidthTolerance)
         {
             return BuildSrcSet(path, parameters, begin, end, tol, false);
         }
@@ -193,6 +193,7 @@ namespace Imgix
         /// <returns>srcset attribute string</returns>
         public String BuildSrcSet(String path, Dictionary<String, String> parameters, List<int> targets)
         {
+            Validator.ValidateWidths(targets);
             return GenerateSrcSetPairs(path, parameters, targets: targets);
         }
 
@@ -219,7 +220,7 @@ namespace Imgix
             Dictionary<String, String> parameters,
             int begin = MinWidth,
             int end = MaxWidth,
-            int tol = SrcSetWidthTolerance,
+            double tol = SrcSetWidthTolerance,
             Boolean disableVariableQuality = false)
         {
 
@@ -307,8 +308,9 @@ namespace Imgix
             GenerateTargetWidths(
                 int begin = MinWidth,
                 int end = MaxWidth,
-                int tol = SrcSetWidthTolerance)
+                double tol = SrcSetWidthTolerance)
         {
+            Validator.ValidateMinMaxTol(begin, end, tol);
             return ComputeTargetWidths(begin, end, tol);
         }
 
@@ -346,7 +348,7 @@ namespace Imgix
             while (begin < end && begin < MaxWidth)
             {
                 resolutions.Add((int) Math.Round(begin));
-                begin *= 1 + (tol / 100) * 2;
+                begin *= 1 + tol * 2;
             }
 
             if (resolutions.Last() < end)

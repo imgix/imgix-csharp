@@ -1,7 +1,6 @@
 ﻿using NUnit.Framework;
 using System;
 using System.Collections.Generic;
-using Imgix;
 using System.Security.Cryptography;
 using System.Linq;
 
@@ -638,7 +637,7 @@ namespace Imgix.Tests
                 new Dictionary<string, string>(),
                 begin: 100,
                 end: 108,
-                tol: 1);
+                tol: 0.01);
 
             Assert.AreEqual(expect100to108, srcset100to108);
         }
