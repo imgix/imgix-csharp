@@ -4,9 +4,9 @@
 `imgix-csharp` is a client library for generating image URLs with [imgix](https://www.imgix.com/). 
 
 [![Version](https://img.shields.io/nuget/v/imgix)](https://www.nuget.org/packages/Imgix/)
-[![Build Status](https://travis-ci.org/imgix/Imgix-CSharp.svg?branch=master)](https://travis-ci.org/imgix/Imgix-CSharp)
+[![Build Status](https://travis-ci.org/imgix/Imgix-CSharp.svg?branch=main)](https://travis-ci.org/imgix/Imgix-CSharp)
 ![Downloads](https://img.shields.io/nuget/dt/imgix-csharp)
-[![License](https://img.shields.io/github/license/imgix/imgix-csharp)](https://github.com/imgix/imgix-csharp/blob/master/LICENSE)
+[![License](https://img.shields.io/github/license/imgix/imgix-csharp)](https://github.com/imgix/imgix-csharp/blob/main/LICENSE)
 
 ---
 <!-- /ix-docs-ignore -->
