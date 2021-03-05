@@ -1,0 +1,42 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "ix-build-debug",
+      "command": "sh .vscode/ix-build-debug.sh",
+      "type": "shell",
+      "args": [],
+      "group": "test",
+    },
+    {
+      "label": "build-testrunner",
+      "command": "sh .vscode/build-testrunner.sh",
+      "type": "shell",
+      "args": [],
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "dependsOn": [
+        "ix-build-debug"
+      ],
+    },
+    {
+      "label": "ix-test",
+      "command": "sh .vscode/ix-test.sh",
+      "type": "shell",
+      "args": [],
+      "group": "test",
+      "dependsOn": [
+        "build-testrunner"
+      ]
+    },
+    {
+      "label": "ix-build-release",
+      "command": "sh .vscode/ix-build-release.sh",
+      "type": "shell",
+      "args": [],
+      "group": "build",
+    },
+  ]
+}
