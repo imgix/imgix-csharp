@@ -303,3 +303,6 @@ __pycache__/
 
 # OpenCover UI analysis results
 OpenCover/
+
+# Test runners that get built by vscode shell script
+/testrunner
