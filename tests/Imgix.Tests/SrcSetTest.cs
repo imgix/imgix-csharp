@@ -246,6 +246,21 @@ namespace Imgix.Tests
             Assert.AreEqual(expectedPairs, srcsetHeightSplit.Length);
         }
 
+        [Test]
+        public void testHeightBasedSrcsetHasDprValues()
+        {
+            String generatedRatio;
+            int expectedRatio = 1;
+            Assert.True(srcsetHeightSplit.Length == 5);
+
+            foreach (String src in srcsetHeightSplit)
+            {
+                generatedRatio = src.Split(' ')[1];
+                Assert.AreEqual(expectedRatio + "x", generatedRatio);
+                expectedRatio++;
+            }
+        }
+
         // TODO: remove this test, deprecated
         // [Test]
         // public void HeightDoesNotExceedBounds()
