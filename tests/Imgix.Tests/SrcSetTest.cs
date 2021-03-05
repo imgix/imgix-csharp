@@ -261,6 +261,18 @@ namespace Imgix.Tests
             }
         }
 
+        [Test]
+        public void testHeightIncludesDPRParam()
+        {
+            String src;
+
+            for (int i = 0; i < srcsetHeightSplit.Length; i++)
+            {
+                src = srcsetHeightSplit[i].Split(' ')[0];
+                Assert.IsTrue(src.Contains(String.Format("dpr={0}", i + 1)));
+            }
+        }
+
         // TODO: remove this test, deprecated
         // [Test]
         // public void HeightDoesNotExceedBounds()
