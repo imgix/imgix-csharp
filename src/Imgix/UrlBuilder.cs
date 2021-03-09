@@ -364,7 +364,6 @@ namespace Imgix
         {
             Boolean hasWidth = parameters.TryGetValue("w", out String width);
             Boolean hasHeight = parameters.TryGetValue("h", out String height);
-            Boolean hasAspectRatio = parameters.TryGetValue("ar", out String aspectRatio);
 
             // If `params` have a width param or height parameters then the
             // srcset to be constructed with these params _is dpr based_
