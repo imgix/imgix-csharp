@@ -1,0 +1,1 @@
+mono ./testrunner/NUnit.Runners.2.6.4/tools/nunit-console.exe ./tests/Imgix.Tests/bin/Debug/net46/Imgix.Tests.dll;

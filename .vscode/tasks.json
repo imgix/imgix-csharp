@@ -2,15 +2,15 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "ix-build-debug",
-      "command": "sh .vscode/ix-build-debug.sh",
+      "label": "msbuild: debug",
+      "command": "sh .vscode/msbuild-debug.sh",
       "type": "shell",
       "args": [],
       "group": "test",
     },
     {
-      "label": "build-testrunner",
-      "command": "sh .vscode/build-testrunner.sh",
+      "label": "nuget: install",
+      "command": "sh .vscode/nuget-install.sh",
       "type": "shell",
       "args": [],
       "group": {
@@ -18,22 +18,22 @@
         "isDefault": true
       },
       "dependsOn": [
-        "ix-build-debug"
+        "msbuild: debug"
       ],
     },
     {
-      "label": "ix-test",
-      "command": "sh .vscode/ix-test.sh",
+      "label": "mono: test",
+      "command": "sh .vscode/mono-test.sh",
       "type": "shell",
       "args": [],
       "group": "test",
       "dependsOn": [
-        "build-testrunner"
+        "nuget: install"
       ]
     },
     {
-      "label": "ix-build-release",
-      "command": "sh .vscode/ix-build-release.sh",
+      "label": "msbuild: release",
+      "command": "sh .vscode/msbuild-release.sh",
       "type": "shell",
       "args": [],
       "group": "build",
