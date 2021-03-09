@@ -3,16 +3,24 @@
   "tasks": [
     {
       "label": "msbuild: debug",
-      "command": "sh .vscode/msbuild-debug.sh",
+      "command": "msbuild",
       "type": "shell",
-      "args": [],
+      "args": ["/p:Configuration=Debug", "imgix-csharp.sln"],
       "group": "test",
+      "problemMatcher": "$msCompile",
     },
     {
       "label": "nuget: install",
-      "command": "sh .vscode/nuget-install.sh",
+      "command": "nuget",
       "type": "shell",
-      "args": [],
+      "args": [
+        "install",
+        "NUnit.Runners",
+        "-Version",
+        "2.6.4",
+        "-OutputDirectory",
+        "testrunner",
+      ],
       "group": {
         "kind": "test",
         "isDefault": true
@@ -23,9 +31,12 @@
     },
     {
       "label": "mono: test",
-      "command": "sh .vscode/mono-test.sh",
+      "command": "mono",
       "type": "shell",
-      "args": [],
+      "args": [
+        "./testrunner/NUnit.Runners.2.6.4/tools/nunit-console.exe",
+        "./tests/Imgix.Tests/bin/Debug/net46/Imgix.Tests.dll",
+      ],
       "group": "test",
       "dependsOn": [
         "nuget: install"
@@ -33,10 +44,11 @@
     },
     {
       "label": "msbuild: release",
-      "command": "sh .vscode/msbuild-release.sh",
+      "command": "msbuild",
       "type": "shell",
-      "args": [],
+      "args": ["/p:Configuration=Release", "imgix-csharp.sln"],
       "group": "build",
+      "problemMatcher": "$msCompile",
     },
   ]
 }
