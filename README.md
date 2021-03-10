@@ -100,9 +100,9 @@ https://domain.imgix.net/bridge.png?w=8192&s=152551ce4ec155f7a03f60f762a1ca33 81
 
 ### Fixed-Width Images
 
-In cases where enough information is provided about an image's dimensions, `BuildSrcSet()` will instead build a `srcset` that will allow for an image to be served at different resolutions. The parameters taken into consideration when determining if an image is fixed-width are `w` (width), `h` (height), and `ar` (aspect ratio).
+In cases where enough information is provided about an image's dimensions, `BuildSrcSet()` will instead build a `srcset` that will allow for an image to be served at different resolutions. The parameters taken into consideration when determining if an image is fixed-width are `w` (width) and `h` (height).
 
-By invoking `BuildSrcSet()` with either a width **or** the height and aspect ratio (along with `fit=crop`, typically) provided, a different `srcset` will be generated for a fixed-size image instead.
+By invoking `BuildSrcSet()` with either a width **or** height provided, a different `srcset` will be generated for a fixed-size image instead.
 
 ```csharp
 var builder = new UrlBuilder("domain.imgix.net", "my-token", false, true);
