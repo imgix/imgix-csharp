@@ -204,27 +204,6 @@ namespace Imgix.Tests
             }
         }
 
-        [Test]
-        public void HeightGeneratesCorrectWidths()
-        {
-            int[] targetWidths = {
-                100, 116, 135, 156, 181, 210, 244, 283,
-                328, 380, 441, 512, 594, 689, 799, 927,
-                1075, 1247, 1446, 1678, 1946, 2257, 2619,
-                3038, 3524, 4087, 4741, 5500, 6380, 7401, 8192};
-
-            String generatedWidth;
-            int index = 0;
-            int widthInt;
-
-            foreach (String src in srcsetHeightSplit)
-            {
-                generatedWidth = src.Split(' ')[1];
-                widthInt = int.Parse(generatedWidth.Substring(0, generatedWidth.Length - 1));
-                Assert.AreEqual(targetWidths[index], widthInt);
-                index++;
-            }
-        }
 
         [Test]
         public void HeightContainsHeightParameter()
@@ -241,42 +220,34 @@ namespace Imgix.Tests
         [Test]
         public void HeightReturnsExpectedNumberOfPairs()
         {
-            int expectedPairs = 31;
+            int expectedPairs = 5;
             Assert.AreEqual(expectedPairs, srcsetHeightSplit.Length);
         }
 
         [Test]
-        public void HeightDoesNotExceedBounds()
+        public void testHeightBasedSrcsetHasDprValues()
         {
-            String minWidth = srcsetHeightSplit[0].Split(' ')[1];
-            String maxWidth = srcsetHeightSplit[srcsetHeightSplit.Length - 1].Split(' ')[1];
-
-            int minWidthInt = int.Parse(minWidth.Substring(0, minWidth.Length - 1));
-            int maxWidthInt = int.Parse(maxWidth.Substring(0, maxWidth.Length - 1));
-
-            Assert.True(minWidthInt >= 100);
-            Assert.True(maxWidthInt <= 8192);
-        }
-
-        // a 17% testing threshold is used to account for rounding
-        [Test]
-        public void testHeightDoesNotIncreaseMoreThan17Percent()
-        {
-            const double INCREMENT_ALLOWED = .17;
-            String width;
-            int widthInt, prev;
-
-            // convert and store first width (typically: 100)
-            width = srcsetHeightSplit[0].Split(' ')[1];
-            prev = int.Parse(width.Substring(0, width.Length - 1));
+            String generatedRatio;
+            int expectedRatio = 1;
+            Assert.True(srcsetHeightSplit.Length == 5);
 
             foreach (String src in srcsetHeightSplit)
             {
-                width = src.Split(' ')[1];
-                widthInt = int.Parse(width.Substring(0, width.Length - 1));
+                generatedRatio = src.Split(' ')[1];
+                Assert.AreEqual(expectedRatio + "x", generatedRatio);
+                expectedRatio++;
+            }
+        }
 
-                Assert.True((widthInt / prev) < (1 + INCREMENT_ALLOWED));
-                prev = widthInt;
+        [Test]
+        public void testHeightIncludesDPRParam()
+        {
+            String src;
+
+            for (int i = 0; i < srcsetHeightSplit.Length; i++)
+            {
+                src = srcsetHeightSplit[i].Split(' ')[0];
+                Assert.IsTrue(src.Contains(String.Format("dpr={0}", i + 1)));
             }
         }
 
