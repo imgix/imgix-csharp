@@ -248,14 +248,14 @@ namespace Imgix
             // variable quality has been disabled.
             Boolean hasQuality = parameters.TryGetValue("q", out String q);
 
-            foreach(int ratio in DprRatios)
+            foreach (int ratio in DprRatios)
             {
                 if (!disableVariableQuality && !hasQuality)
                 {
                     srcSetParams["q"] = DprQualities[ratio - 1].ToString();
                 }
                 srcSetParams["dpr"] = ratio.ToString();
-                srcset += BuildUrl(path, srcSetParams) + " " + ratio.ToString()+ "x,\n";
+                srcset += BuildUrl(path, srcSetParams) + " " + ratio.ToString() + "x,\n";
             }
 
             return srcset.Substring(0, srcset.Length - 2);
@@ -273,7 +273,7 @@ namespace Imgix
 
             String srcset = "";
 
-            foreach(int width in targets)
+            foreach (int width in targets)
             {
                 parameters["w"] = width.ToString();
                 srcset += BuildUrl(path, parameters) + " " + width + "w,\n";
@@ -333,7 +333,7 @@ namespace Imgix
          */
         private static List<int> ComputeTargetWidths(double begin, double end, double tol)
         {
-            if(NotCustom(begin, end, tol))
+            if (NotCustom(begin, end, tol))
             {
                 // If not custom, return the default target widths.
                 return SrcSetTargetWidths.ToList();
@@ -341,19 +341,19 @@ namespace Imgix
 
             if (begin == end)
             {
-                return new List<int> {(int) Math.Round(begin) };
+                return new List<int> { (int)Math.Round(begin) };
             }
 
             List<int> resolutions = new List<int>();
             while (begin < end && begin < MaxWidth)
             {
-                resolutions.Add((int) Math.Round(begin));
+                resolutions.Add((int)Math.Round(begin));
                 begin *= 1 + tol * 2;
             }
 
             if (resolutions.Last() < end)
             {
-                resolutions.Add((int) Math.Round(end));
+                resolutions.Add((int)Math.Round(end));
             }
 
             return resolutions;
@@ -396,13 +396,16 @@ namespace Imgix
                         encodedKey = encodedKey.Replace("+", "%20");
                         String encodedVal;
 
-                        if (p.Key.EndsWith("64")) {
+                        if (p.Key.EndsWith("64"))
+                        {
                             Byte[] valBytes = System.Text.Encoding.UTF8.GetBytes(p.Value);
                             encodedVal = System.Convert.ToBase64String(valBytes);
                             encodedVal = encodedVal.Replace("=", "");
                             encodedVal = encodedVal.Replace("/", "_");
                             encodedVal = encodedVal.Replace("+", "-");
-                        } else {
+                        }
+                        else
+                        {
                             encodedVal = WebUtility.UrlEncode(p.Value);
                             encodedVal = encodedVal.Replace("+", "%20");
                         }
