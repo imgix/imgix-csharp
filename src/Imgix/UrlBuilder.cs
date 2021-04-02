@@ -25,6 +25,8 @@ namespace Imgix
         private static readonly int[] DprRatios = { 1, 2, 3, 4, 5 };
         private static readonly int[] DprQualities = { 75, 50, 35, 23, 20 };
 
+        const String IS_ENCODED = "isEncoded";
+        const String IS_PROXY = "isProxy";
 
         const int MaxWidth = 8192;
         const int MinWidth = 100;
@@ -56,29 +58,25 @@ namespace Imgix
             return BuildUrl(path, new Dictionary<string, string>());
         }
 
+        /// <summary>
+        /// Create a resolvable imgix url.
+        /// 
+        /// </summary>
+        /// <param name="path">path to the image, i.e. "image/file.png"</param>
+        /// <param name="parameters">dictionary of query parameters</param>
+        /// <returns>resolvable URL</returns>
+
+        /*
+        * Encodes the `path` and `paramater` arguments to the UTF8 
+        * scheme and returns a formatted string that conforms to the 
+        * "{scheme}://{domain}/{path}{params}" format.
+        */
         public String BuildUrl(String path, Dictionary<String, String> parameters)
         {
-
-            if (path.StartsWith("http"))
-            {
-                path = WebUtility.UrlEncode(path);
-            }
-
-            Boolean hasLibParam = parameters.TryGetValue("ixlib", out String hasLib);
-            if (IncludeLibraryParam && !hasLibParam)
-            {
-                parameters.Add("ixlib", String.Format("csharp-{0}", typeof(UrlBuilder).GetTypeInfo().Assembly.GetName().Version));
-            }
-
-            return GenerateUrl(Domain, path, parameters);
-        }
-
-        private String GenerateUrl(String domain, String path, Dictionary<String, String> parameters)
-        {
             String scheme = UseHttps ? "https" : "http";
-            path = path.TrimEnd('/').TrimStart('/');
+            path = SanitizePath(path);
 
-            var qs = GenerateUrlStringFromDict(parameters);
+            var qs = BuildParams(parameters);
             var localParams = new Dictionary<String, String>(parameters);
 
             if (!String.IsNullOrEmpty(_signKey))
@@ -86,9 +84,190 @@ namespace Imgix
                 var hashString = String.Format("{0}/{1}{2}", _signKey, path, localParams.Any() ? "?" + qs : String.Empty);
                 localParams.Add("s", HashString(hashString));
             }
-
-            return String.Format("{0}://{1}/{2}{3}", scheme, domain, path, localParams.Any() ? "?" + GenerateUrlStringFromDict(localParams) : String.Empty);
+            return String.Format("{0}://{1}/{2}{3}", scheme, Domain, path, localParams.Any() ? "?" + BuildParams(localParams) : String.Empty);
         }
+
+        /**
+        * SanitizePath strips the leading slash. It `UrlEncodes` proxy paths to ensure *all* 
+        * characters are handled. If path is not being used as a proxy it leaves legal 
+        * characters, like '/' and '@', alone while encoding the rest using `EncodeURI`.
+        */
+        private String SanitizePath(String p)
+        {
+            String path = p;
+            // Strip leading slash first (we'll re-add after encoding).
+            path = path.TrimEnd('/').TrimStart('/');
+
+            // Check if path is a proxy path and store type of proxy.
+            Dictionary<String, Boolean> proxyStatus = CheckProxyStatus(path);
+            Object pathIsProxy = proxyStatus[IS_PROXY];
+            Object proxyIsEncoded = proxyStatus[IS_ENCODED];
+
+            if (pathIsProxy.Equals(true) && proxyIsEncoded.Equals(false))
+            {
+                // Use WebUtility.UrlEncode to ensure *all* characters are handled,
+                // since it's being used as a path.
+                return WebUtility.UrlEncode(path);
+            }
+            else if (pathIsProxy.Equals(true) && proxyIsEncoded.Equals(true))
+            {
+                // Do nothing to URL being used as path since its encoded.
+                return path;
+            }
+            else
+            {
+                // The path is not being used as a proxy, so leave
+                // legal characters like '/' and '@' alone.
+                return EncodeURI(path);
+            }
+        }
+
+        /*
+        * EncodeURI encodes string `p` to the UTF8 format. It splits
+        * the string on the `/` character to avoid accidentally
+        * encoding them. It then iterates over every character and
+        * calls the `UrlEncode` method on them. Finally, it joins
+        * the string array on `/`, adding the removed character back.
+        */
+        private String EncodeURI(String p)
+        {
+            string[] splitPath = p.Split('/');
+            List<String> sanitizedPath = new List<String>();
+
+            foreach (String s in splitPath)
+            {
+                sanitizedPath.Add(UrlEncode(s));
+            }
+
+            return string.Join("/", sanitizedPath);
+        }
+
+
+        /* 
+        * CheckProxyStatus checks if the path has one of the four possible
+        * acceptable proxy prefixes. First we check if the path has the
+        * correct ascii prefix. If it does then we know that it is a proxy,
+        * but it's not percent encoded. Second, we check if the path is
+        * prefixed by a percent-encoded prefix. If it is, we know that it's
+        * a proxy and that it's percent-encoded. Finally, if the path isn't
+        * prefixed by any of these four prefixes, it is not a valid proxy.
+        * This might be "just enough validation," but if we run into issues
+        * we can make this check smarter/more-robust.
+        */
+        private static Dictionary<String, Boolean> CheckProxyStatus(String p)
+        {
+            String path = p;
+            Dictionary<String, Boolean> status = new Dictionary<String, Boolean>();
+            path.Replace("^/", "");
+
+            String asciiHTTP = "http://";
+            String asciiHTTPS = "https://";
+
+            String encodedHTTP = "http%3A%2F%2F";
+            String encodedHTTPS = "https%3A%2F%2F";
+
+            String encodedHTTPLower = "http%3a%2f%2f";
+            String encodedHTTPSLower = "https%3a%ff%2f";
+
+            if (path.StartsWith(asciiHTTP) || path.StartsWith(asciiHTTPS))
+            {
+                status.Add(IS_PROXY, true);
+                status.Add(IS_ENCODED, false);
+
+            }
+            else if (path.StartsWith(encodedHTTP) || path.StartsWith(encodedHTTPS))
+            {
+                status.Add(IS_PROXY, true);
+                status.Add(IS_ENCODED, true);
+
+            }
+            else if (path.StartsWith(encodedHTTPLower) || path.StartsWith(encodedHTTPSLower))
+            {
+                status.Add(IS_PROXY, true);
+                status.Add(IS_ENCODED, true);
+
+            }
+            else
+            {
+                status.Add(IS_PROXY, false);
+                status.Add(IS_ENCODED, false);
+            }
+
+            return status;
+        }
+
+        /**
+        * BuildParams encodes each K,V pair. If key ends with 64, Base64 encode 
+        * the value. Also encodes "+$:? " reserved characters, which is standard
+        * for imgix libraries. It returns a formatted string which conforms to
+        * "{encodedKey}={encodedVal}".
+        */
+        private String BuildParams(Dictionary<String, String> parameters)
+        {
+            Boolean hasLibParam = parameters.TryGetValue("ixlib", out String hasLib);
+
+            if (IncludeLibraryParam && !hasLibParam)
+            {
+                parameters.Add("ixlib", String.Format("csharp-{0}", typeof(UrlBuilder).GetTypeInfo().Assembly.GetName().Version));
+            }
+
+            return parameters == null ?
+                String.Empty :
+                String.Join("&", parameters.Select(p =>
+                {
+                    String encodedKey = WebUtility.UrlEncode(p.Key);
+                    encodedKey = encodedKey.Replace("+", "%20");
+                    String encodedVal;
+
+                    if (p.Key.EndsWith("64"))
+                    {
+                        encodedVal = Base64Encode(p.Value);
+                    }
+                    else
+                    {
+                        encodedVal = UrlEncode(p.Value);
+                    }
+                    return String.Format("{0}={1}", encodedKey, encodedVal);
+                }
+                ));
+        }
+
+        /*
+        * Base64Encode encodes a string `value` to the Base64 format. It does 
+        * this by calling the `System.Convert.ToBase64String` method on `value`
+        * and additionally encoding reserved, `=/+` characters.
+        */
+        private String Base64Encode(String value)
+        {
+            String encodedVal;
+            Byte[] valBytes = System.Text.Encoding.UTF8.GetBytes(value);
+            encodedVal = System.Convert.ToBase64String(valBytes);
+            encodedVal = encodedVal.Replace("=", "");
+            encodedVal = encodedVal.Replace("/", "_");
+            encodedVal = encodedVal.Replace("+", "-");
+            return encodedVal;
+        }
+
+        /*
+        * UrlEncode encodes a string `value` to the UTF8 format. It does 
+        * this by calling the `WebUtility.UrlEncode` method on `value` and
+        * doing some additional encoding on replacement reserved, `+:?#`,
+        * and decoding on delimiter, `~`, characters.
+        */
+        private String UrlEncode(String value)
+        {
+            String encodedVal;
+
+            encodedVal = WebUtility.UrlEncode(value);
+            encodedVal = encodedVal.Replace("+", "%20");
+            encodedVal = encodedVal.Replace(":", "%3A");
+            encodedVal = encodedVal.Replace("?", "%3F");
+            encodedVal = encodedVal.Replace("#", "%23");
+            encodedVal = encodedVal.Replace("%7E", "~");
+
+            return encodedVal;
+        }
+
 
         public String BuildSrcSet(String path)
         {
@@ -384,35 +563,6 @@ namespace Imgix
         private String HashString(String input)
         {
             return BitConverter.ToString(MD5.Create().ComputeHash(input.Select(Convert.ToByte).ToArray())).Replace("-", "").ToLower();
-        }
-
-        private String GenerateUrlStringFromDict(Dictionary<String, String> queryDictionary)
-        {
-            return queryDictionary == null ?
-                String.Empty :
-                String.Join("&", queryDictionary.Select(p =>
-                    {
-                        String encodedKey = WebUtility.UrlEncode(p.Key);
-                        encodedKey = encodedKey.Replace("+", "%20");
-                        String encodedVal;
-
-                        if (p.Key.EndsWith("64"))
-                        {
-                            Byte[] valBytes = System.Text.Encoding.UTF8.GetBytes(p.Value);
-                            encodedVal = System.Convert.ToBase64String(valBytes);
-                            encodedVal = encodedVal.Replace("=", "");
-                            encodedVal = encodedVal.Replace("/", "_");
-                            encodedVal = encodedVal.Replace("+", "-");
-                        }
-                        else
-                        {
-                            encodedVal = WebUtility.UrlEncode(p.Value);
-                            encodedVal = encodedVal.Replace("+", "%20");
-                        }
-
-                        return String.Format("{0}={1}", encodedKey, encodedVal);
-                    }
-                ));
         }
     }
 }
