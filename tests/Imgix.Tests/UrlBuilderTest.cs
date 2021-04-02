@@ -99,6 +99,23 @@ namespace Imgix.Tests
             Assert.AreEqual("https://demo.imgix.net/demo.png?hello_world=%2Ffoo%22%3E%20%3Cscript%3Ealert(%22hacked%22)%3C%2Fscript%3E%3C", test.BuildUrl("demo.png", parameters));
         }
 
+        [TestFixture]
+        public class UrlBuilderBase64EncodesBase64
+        {
+            UrlBuilder test = new UrlBuilder("demo.imgix.net", includeLibraryParam: false);
+            private string path;
+            private string expected;
+            [Test]
+            [TestCase("/&$+,:;=?@#.jpg", "https://demo.imgix.net/%26%24%2B%2C%3A%3B%3D%3F%40%23.jpg")]
+            [TestCase("/ <>[]{}|\\^%.jpg", "https://demo.imgix.net/%20%3C%3E%5B%5D%7B%7D%7C%5C%5E%25.jpg")]
+            [TestCase("/ساندویچ.jpg", "https://demo.imgix.net/%D8%B3%D8%A7%D9%86%D8%AF%D9%88%DB%8C%DA%86.jpg")]
+            public void UrlBuilderBase64EncodesPathVariant(String path, String expected)
+            {
+                var actual = test.BuildUrl(path);
+                Assert.AreEqual(expected, actual);
+            }
+
+        }
         [Test]
         public void UrlBuilderBase64EncodesBase64ParamVariants()
         {
