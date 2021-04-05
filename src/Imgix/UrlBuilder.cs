@@ -25,9 +25,6 @@ namespace Imgix
         private static readonly int[] DprRatios = { 1, 2, 3, 4, 5 };
         private static readonly int[] DprQualities = { 75, 50, 35, 23, 20 };
 
-        const String IS_ENCODED = "isEncoded";
-        const String IS_PROXY = "isProxy";
-
         const int MaxWidth = 8192;
         const int MinWidth = 100;
         const double SrcSetWidthTolerance = 0.08;
@@ -100,8 +97,8 @@ namespace Imgix
 
             // Check if path is a proxy path and store type of proxy.
             Dictionary<String, Boolean> proxyStatus = CheckProxyStatus(path);
-            Object pathIsProxy = proxyStatus[IS_PROXY];
-            Object proxyIsEncoded = proxyStatus[IS_ENCODED];
+            Object pathIsProxy = proxyStatus["isProxy"];
+            Object proxyIsEncoded = proxyStatus["isEncoded"];
 
             if (pathIsProxy.Equals(true) && proxyIsEncoded.Equals(false))
             {
@@ -171,26 +168,26 @@ namespace Imgix
 
             if (path.StartsWith(asciiHTTP) || path.StartsWith(asciiHTTPS))
             {
-                status.Add(IS_PROXY, true);
-                status.Add(IS_ENCODED, false);
+                status.Add("isProxy", true);
+                status.Add("isEncoded", false);
 
             }
             else if (path.StartsWith(encodedHTTP) || path.StartsWith(encodedHTTPS))
             {
-                status.Add(IS_PROXY, true);
-                status.Add(IS_ENCODED, true);
+                status.Add("isProxy", true);
+                status.Add("isEncoded", true);
 
             }
             else if (path.StartsWith(encodedHTTPLower) || path.StartsWith(encodedHTTPSLower))
             {
-                status.Add(IS_PROXY, true);
-                status.Add(IS_ENCODED, true);
+                status.Add("isProxy", true);
+                status.Add("isEncoded", true);
 
             }
             else
             {
-                status.Add(IS_PROXY, false);
-                status.Add(IS_ENCODED, false);
+                status.Add("isProxy", false);
+                status.Add("isEncoded", false);
             }
 
             return status;
