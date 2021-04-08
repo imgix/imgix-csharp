@@ -49,46 +49,44 @@ namespace Imgix
             : this(domain, signKey: signKey, includeLibraryParam: true, useHttps: useHttps)
         {
         }
-
+        /// <summary>
+        /// Encode the `path` argument to the UTF8 scheme.
+        /// </summary>
+        /// <param name="path">path to the image, i.e. "image/file.png"</param>
+        /// <returns>Formatted URL String that conforms to the
+        /// "{scheme}://{domain}/{path}" format.</returns>
         public String BuildUrl(String path)
         {
             return BuildUrl(path, new Dictionary<string, string>());
         }
 
         /// <summary>
-        /// Create a resolvable imgix url.
-        /// 
+        /// Encode the `path` and `paramater` arguments to the UTF8 scheme.
         /// </summary>
         /// <param name="path">path to the image, i.e. "image/file.png"</param>
         /// <param name="parameters">dictionary of query parameters</param>
-        /// <returns>resolvable URL</returns>
-
-        /*
-        * Encodes the `path` and `paramater` arguments to the UTF8 
-        * scheme and returns a formatted string that conforms to the 
-        * "{scheme}://{domain}/{path}{params}" format.
-        */
+        /// <returns>Formatted URL String that conforms to the
+        /// "{scheme}://{domain}/{path}{params}" format.</returns>
         public String BuildUrl(String path, Dictionary<String, String> parameters)
         {
             String scheme = UseHttps ? "https" : "http";
             path = SanitizePath(path);
 
-            var qs = BuildParams(parameters);
-            var localParams = new Dictionary<String, String>(parameters);
-
+            var finalParams = BuildParams(parameters);
             if (!String.IsNullOrEmpty(_signKey))
             {
-                var hashString = String.Format("{0}/{1}{2}", _signKey, path, localParams.Any() ? "?" + qs : String.Empty);
-                localParams.Add("s", HashString(hashString));
+                finalParams = SignParams(path, finalParams);
             }
-            return String.Format("{0}://{1}/{2}{3}", scheme, Domain, path, localParams.Any() ? "?" + BuildParams(localParams) : String.Empty);
+            return String.Format("{0}://{1}/{2}{3}", scheme, Domain, path, finalParams);
         }
 
-        /**
-        * SanitizePath strips the leading slash. It `UrlEncodes` proxy paths to ensure *all* 
-        * characters are handled. If path is not being used as a proxy it leaves legal 
-        * characters, like '/' and '@', alone while encoding the rest using `EncodeURI`.
-        */
+        /// <summary>
+        /// `UrlEncodes` proxy paths to ensure *all* characters are handled.  If
+        /// path is not being used as a proxy leave legal characters, like '/'
+        /// and '@', alone while encoding the rest using `EncodeURI` method.
+        /// </summary>
+        /// <param name="p">path to the image, i.e. "image/file.png"</param>
+        /// <returns>UTF8 encoded path string.</returns>
         private String SanitizePath(String p)
         {
             String path = p;
@@ -113,19 +111,22 @@ namespace Imgix
             }
             else
             {
-                // The path is not being used as a proxy, so leave
-                // legal characters like '/' and '@' alone.
+                // The path is not being used as a proxy, so leave legal
+                // characters like '/' and '@' alone but encode the rest.
                 return EncodeURI(path);
             }
         }
 
-        /*
-        * EncodeURI encodes string `p` to the UTF8 format. It splits
-        * the string on the `/` character to avoid accidentally
-        * encoding them. It then iterates over every character and
-        * calls the `UrlEncode` method on them. Finally, it joins
-        * the string array on `/`, adding the removed character back.
-        */
+        /// <summary>
+        /// Encode string `p` to the UTF8 format. Splits the string on the
+        /// `/` character to avoid accidentally encoding them. Then, iterate
+        /// over every character and call the `UrlEncode` method on them.
+        /// Finally, join the string array on `/`, adding the removed
+        /// character back.
+        /// </summary>
+        /// <param name="p">path to the image, i.e. "image/file.png"</param>
+        /// <returns>Encoded path string</returns>
+
         private String EncodeURI(String p)
         {
             string[] splitPath = p.Split('/');
@@ -139,23 +140,22 @@ namespace Imgix
             return string.Join("/", sanitizedPath);
         }
 
-
-        /* 
-        * CheckProxyStatus checks if the path has one of the four possible
-        * acceptable proxy prefixes. First we check if the path has the
-        * correct ascii prefix. If it does then we know that it is a proxy,
-        * but it's not percent encoded. Second, we check if the path is
-        * prefixed by a percent-encoded prefix. If it is, we know that it's
-        * a proxy and that it's percent-encoded. Finally, if the path isn't
-        * prefixed by any of these four prefixes, it is not a valid proxy.
-        * This might be "just enough validation," but if we run into issues
-        * we can make this check smarter/more-robust.
-        */
+        /// <summary>
+        /// Check if the path has one of the four possible acceptable proxy
+        /// prefixes. First we check if the path has the correct ascii prefix.
+        /// If it does then we know that it is a proxy, but it's not percent
+        /// encoded. Second, we check if the path is prefixed by a percent-encoded
+        /// prefix. If it is, we know that it's a proxy and that it's percent-encoded.
+        /// Finally, if the path isn't prefixed by any of these four prefixes, it is
+        /// not a valid proxy. This might be "just enough validation," but if we run
+        /// into issues we can make this check smarter/more-robust.
+        /// </summary>
+        /// <param name="p">path to the image, i.e. "image/file.png"</param>
+        /// <returns>Dictionary status =  {isProxy: Boolean, isEncoded: Boolean} </returns>
         private static Dictionary<String, Boolean> CheckProxyStatus(String p)
         {
             String path = p;
             Dictionary<String, Boolean> status = new Dictionary<String, Boolean>();
-            path.Replace("^/", "");
 
             String asciiHTTP = "http://";
             String asciiHTTPS = "https://";
@@ -193,12 +193,14 @@ namespace Imgix
             return status;
         }
 
-        /**
-        * BuildParams encodes each K,V pair. If key ends with 64, Base64 encode 
-        * the value. Also encodes "+$:? " reserved characters, which is standard
-        * for imgix libraries. It returns a formatted string which conforms to
-        * "{encodedKey}={encodedVal}".
-        */
+        /// <summary>
+        /// Encode each K,V pair. If key ends with 64, Base64 encode
+        /// the value. Also encode "+$:? " reserved characters.
+        /// </summary>
+        /// <param name="paramters">Dictionary of K,V parameter pairs</param>
+        /// <returns>Formatted query string which conforms to
+        /// "{encodedKey}={encodedVal}". If the parameters Dictionary has no k/v
+        /// pairs, return an empty String.</returns>
         private String BuildParams(Dictionary<String, String> parameters)
         {
             Boolean hasLibParam = parameters.TryGetValue("ixlib", out String hasLib);
@@ -208,9 +210,13 @@ namespace Imgix
                 parameters.Add("ixlib", String.Format("csharp-{0}", typeof(UrlBuilder).GetTypeInfo().Assembly.GetName().Version));
             }
 
-            return parameters == null ?
-                String.Empty :
-                String.Join("&", parameters.Select(p =>
+            if (parameters == null || parameters.Count == 0)
+            {
+                return String.Empty;
+            }
+            else
+            {
+                return "?" + String.Join("&", parameters.Select(p =>
                 {
                     String encodedKey = WebUtility.UrlEncode(p.Key);
                     encodedKey = encodedKey.Replace("+", "%20");
@@ -227,13 +233,41 @@ namespace Imgix
                     return String.Format("{0}={1}", encodedKey, encodedVal);
                 }
                 ));
+            }
         }
 
-        /*
-        * Base64Encode encodes a string `value` to the Base64 format. It does 
-        * this by calling the `System.Convert.ToBase64String` method on `value`
-        * and additionally encoding reserved, `=/+` characters.
-        */
+        /// <summary>
+        /// Add a signature query parameter if there's a signKey present.
+        /// If there are existing queryParams, concatenate the signature.
+        /// If there aren't, it will create the query params, `?s={signature}`.
+        /// SignParams uses the HashString method to create the signature.
+        /// </summary>
+        /// <param name="path">path to the image, i.e. "image/file.png"</param>
+        /// <param name="queryParams">Encoded query String, ie "?paramKey=paramValue"</param>
+        /// <returns>Encoded String that conforms to "?paramKey=paramValue" </returns>
+        private String SignParams(String path, String queryParams)
+        {
+
+            var signatureBase = String.Format("{0}/{1}{2}", _signKey, path, queryParams);
+            var signature = HashString(signatureBase);
+            if (queryParams.Length > 0)
+            {
+                return queryParams + "&s=" + signature;
+            }
+            else
+            {
+                return "?s=" + signature;
+            }
+
+        }
+
+        /// <summary>
+        /// Encode a string `value` to the Base64 format. It does
+        /// this by calling the `System.Convert.ToBase64String` method on `value`
+        /// and additionally encoding reserved, `=/+` characters.
+        /// </summary>
+        /// <param name="value"> A String, ie "belîév∑"</param>
+        /// <returns>Base64 encoded String</returns>
         private String Base64Encode(String value)
         {
             String encodedVal;
@@ -245,12 +279,14 @@ namespace Imgix
             return encodedVal;
         }
 
-        /*
-        * UrlEncode encodes a string `value` to the UTF8 format. It does 
-        * this by calling the `WebUtility.UrlEncode` method on `value` and
-        * doing some additional encoding on replacement reserved, `+:?#`,
-        * and decoding on delimiter, `~`, characters.
-        */
+        /// <summary>
+        /// Encode a string `value` to the UTF8 format. It does
+        /// this by calling the `WebUtility.UrlEncode` method on `value` and
+        /// doing some additional encoding on replacement reserved, `+:?#`,
+        /// and decoding on delimiter, `~`, characters.
+        /// </summary>
+        /// <param name="value"> A String, ie "$hello%world"</param>
+        /// <returns>UTF8 encoded String</returns>
         private String UrlEncode(String value)
         {
             String encodedVal;
