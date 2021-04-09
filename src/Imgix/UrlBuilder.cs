@@ -141,12 +141,12 @@ namespace Imgix
         }
 
         /// <summary>
-        /// Check if the path has one of the four possible acceptable proxy
+        /// Check if the path has one of the three possible acceptable proxy
         /// prefixes. First we check if the path has the correct ascii prefix.
         /// If it does then we know that it is a proxy, but it's not percent
         /// encoded. Second, we check if the path is prefixed by a percent-encoded
         /// prefix. If it is, we know that it's a proxy and that it's percent-encoded.
-        /// Finally, if the path isn't prefixed by any of these four prefixes, it is
+        /// Finally, if the path isn't prefixed by any of these three prefixes, it is
         /// not a valid proxy. This might be "just enough validation," but if we run
         /// into issues we can make this check smarter/more-robust.
         /// </summary>
