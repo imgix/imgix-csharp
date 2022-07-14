@@ -65,8 +65,7 @@ using Imgix;
 ...
 var builder = new UrlBuilder("domain.imgix.net")
 {
-    SignKey = "aaAAbbBB11223344",
-    IncludeLibraryParam = false
+    SignKey = "aaAAbbBB11223344"
 };
 var parameters = new Dictionary<String, String>();
 parameters["w"] = "500";
@@ -140,7 +139,6 @@ This behavior specifically occurs when a [fixed-width image](#fixed-width-images
 UrlBuilder ub = new UrlBuilder(
     "demo.imgix.net",
     signKey: null,
-    includeLibraryParam: false,
     useHttps: true);
 
 var params = new Dictionary<string, string>() { { "w", "100" } };
@@ -167,7 +165,6 @@ In situations where specific widths are desired when generating `srcset` pairs, 
 UrlBuilder ub = new UrlBuilder(
     "demo.imgix.net",
     signKey: null,
-    includeLibraryParam: false,
     useHttps: true);
 
 int[] widths = { 144, 240, 320, 446, 640 };
@@ -195,7 +192,6 @@ In certain circumstances, you may want to limit the minimum or maximum value of 
 UrlBuilder ub = new UrlBuilder(
     "demo.imgix.net",
     signKey: null,
-    includeLibraryParam: false,
     useHttps: true);
 
 Dictionary<string, string> parameters = new Dictionary<string, string>();
@@ -232,7 +228,6 @@ By default, srcset width `tol`erance is set to 0.08 (8 percent), which we consid
 UrlBuilder ub = new UrlBuilder(
     "demo.imgix.net",
     signKey: null,
-    includeLibraryParam: false,
     useHttps: true);
 
 Dictionary<string, string> parameters = new Dictionary<string, string>();
