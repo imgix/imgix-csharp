@@ -7,13 +7,17 @@ jobs:
     executor: win/default
     steps:
       - checkout
-      - run: msbuild /t:Restore imgix-csharp.sln
-      - run: nuget install NUnit.Runners -Version 2.6.4 -OutputDirectory testrunner
-      - run: msbuild /p:Configuration=Release imgix-csharp.sln
-      - run: dotnet test
+      - run:
+          name: Install
+          command: | 
+            msbuild /t:Restore imgix-csharp.sln
+            nuget install NUnit.Runners -Version 2.6.4 -OutputDirectory testrunner
+            msbuild /p:Configuration=Release imgix-csharp.sln
+      - run:
+          name: Tests
+          command: dotnet test
 
 workflows:
   test:
     jobs:
       - test
-      
