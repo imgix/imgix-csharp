@@ -1,0 +1,19 @@
+version: 2.1
+orbs:
+  win: circleci/windows@5.0.0
+  
+jobs:
+  test:
+    executor: win/default
+    steps:
+      - checkout
+      - run: msbuild /t:Restore imgix-csharp.sln
+      - run: nuget install NUnit.Runners -Version 2.6.4 -OutputDirectory testrunner
+      - run: msbuild /p:Configuration=Release imgix-csharp.sln
+      - run: dotnet test
+
+workflows:
+  test:
+    jobs:
+      - test
+      
